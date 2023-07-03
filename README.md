@@ -21,7 +21,7 @@ This client was developed and tested on [Ubuntu 22.04](http://ubuntu.com) using 
 
 ## How do I run it?
 
-Asuming you already have Docker and Docker Compose installed, just following the instructions below:
+Asuming you already have Docker and Docker Compose [installed](https://github.com/jbuitt/nwwsoi-controller/blob/main/scripts/install_docker.sh), just following the instructions below:
 
 1. First, clone the repo and change directory:
 
