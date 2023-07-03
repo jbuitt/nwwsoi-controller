@@ -57,6 +57,7 @@ docker run --rm --interactive --tty \
   sail-8.2/app:latest \
   key:generate
 ```
+
 6. Now, install the front-end dependencies:
 
 ```
