@@ -67,7 +67,7 @@ docker run --rm --interactive --tty \
   sail-8.2/app:latest
 ```
 
-7. Next, build and start up all the Docker containers by running:
+7. Next, download the other containers and start everything up by running:
 
 ```
 docker compose up -d
