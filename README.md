@@ -37,12 +37,12 @@ source sail.env
 docker compose build
 ```
 
-3. Now, install the PHP and front-end dependencies:
+1. Now, install the PHP dependencies:
 
 ```
 docker run --rm --interactive --tty \
   --volume $PWD:/var/www/html \
-  --entrypoint /usr/local/bin/install_deps.sh \
+  --entrypoint /usr/local/bin/install_php_deps.sh \
   sail-8.2/app:latest
 ```
 
@@ -57,14 +57,22 @@ docker run --rm --interactive --tty \
   sail-8.2/app:latest \
   key:generate
 ```
+6. Now, install the front-end dependencies:
 
-6. Next, build and start up all the Docker containers by running:
+```
+docker run --rm --interactive --tty \
+  --volume $PWD:/var/www/html \
+  --entrypoint /usr/local/bin/install_fe_deps.sh \
+  sail-8.2/app:latest
+```
+
+7. Next, build and start up all the Docker containers by running:
 
 ```
 docker compose up -d
 ```
 
-7. Now, you migrate and seed the database:
+8. Now, you migrate and seed the database:
 
 ```
 docker compose exec -it nwwsoi-controller \
@@ -73,7 +81,7 @@ docker compose exec -it nwwsoi-controller \
    --force
 ```
 
-8. Finally, you can access the dashboard from a browser by going to [http://localhost](http://localhost).
+9. Finally, you can access the dashboard from a browser by going to [http://localhost](http://localhost).
 
 ## .env Environment Variables
 
