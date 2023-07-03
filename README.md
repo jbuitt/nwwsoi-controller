@@ -34,7 +34,7 @@ cd nwwsoi-controller/
 
 ```
 source sail.env
-docker compose build --no-cache .
+docker compose build --no-cache
 ```
 
 3. Now, install the PHP and front-end dependencies:
