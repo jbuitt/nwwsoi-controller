@@ -26,20 +26,20 @@ Asuming you already have Docker and Docker Compose installed, just following the
 1. First, clone the repo:
 
 ```
-$ git clone https://github.com/jbuitt/nwwsoi-controller
+git clone https://github.com/jbuitt/nwwsoi-controller
 ```
 
 2. Next, source the env file and build all of the Docker images:
 
 ```
-$ source sail.env
-$ docker compose build --no-cache .
+source sail.env
+docker compose build --no-cache .
 ```
 
 3. Now, install the PHP and front-end dependencies:
 
 ```
-$ docker run --rm --interactive --tty \
+docker run --rm --interactive --tty \
   --volume $PWD:/var/www/html \
   --entrypoint /usr/local/bin/install_deps.sh \
   sail-8.2/app:latest
@@ -50,7 +50,7 @@ $ docker run --rm --interactive --tty \
 5. Create an Laravel App Key:
 
 ```
-$ docker run --rm --interactive --tty \
+docker run --rm --interactive --tty \
   --volume $PWD:/var/www/html \
   --entrypoint /var/www/html/artisan \
   sail-8.2/app:latest \
