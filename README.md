@@ -23,10 +23,11 @@ This client was developed and tested on [Ubuntu 22.04](http://ubuntu.com) using 
 
 Asuming you already have Docker and Docker Compose installed, just following the instructions below:
 
-1. First, clone the repo:
+1. First, clone the repo and change directory:
 
 ```
 git clone https://github.com/jbuitt/nwwsoi-controller
+cd nwwsoi-controller/
 ```
 
 2. Next, source the env file and build all of the Docker images:
