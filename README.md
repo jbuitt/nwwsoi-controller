@@ -26,7 +26,7 @@ Asuming you already have Docker and Docker Compose installed, just following the
 1. First, clone the repo:
 
 ```
-$ git clone https://git.sm-lan.net/wxnotify/nwwsoi-controller.git
+$ git clone https://github.com/jbuitt/nwwsoi-controller
 ```
 
 2. Next, source the env file and build all of the Docker images:
