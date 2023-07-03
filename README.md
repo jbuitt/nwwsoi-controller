@@ -82,7 +82,7 @@ docker compose exec -it nwwsoi-controller \
    --force
 ```
 
-9. Finally, you can access the dashboard from a browser by going to [http://localhost](http://localhost).
+9. Finally, you can access the dashboard from a browser by going to [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
 ## .env Environment Variables
 
