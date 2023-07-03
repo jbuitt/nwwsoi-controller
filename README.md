@@ -37,7 +37,7 @@ source sail.env
 docker compose build
 ```
 
-1. Now, install the PHP dependencies:
+3. Now, install the PHP dependencies:
 
 ```
 docker run --rm --interactive --tty \
