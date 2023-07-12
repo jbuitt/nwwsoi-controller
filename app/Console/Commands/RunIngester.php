@@ -77,7 +77,7 @@ class RunIngester extends Command
         } else {
             Log::error('Python client path is not defined, exiting.');
         }
+        // Done!
+        return 0;
     }
-    // Done!
-    return 0;
 }
