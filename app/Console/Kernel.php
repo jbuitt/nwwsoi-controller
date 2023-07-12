@@ -19,12 +19,12 @@ class Kernel extends ConsoleKernel
 
         // Purge old products files
         $schedule
-            ->command('nwwsoi-controller:purge_old_products ' . config('nwwsoi-controller.nwwsoi.days_to_keep_products'))
+            ->command('nwwsoi-controller:purge_old_products ' . config('nwwsoi-controller.days_to_keep_products'))
             ->daily();
 
         // Purge old log files
         $schedule
-            ->command('nwwsoi-controller:purge_old_logs ' . config('nwwsoi-controller.nwwsoi.days_to_keep_products'))
+            ->command('nwwsoi-controller:purge_old_logs ' . config('nwwsoi-controller.days_to_keep_logs'))
             ->daily();
     }
 

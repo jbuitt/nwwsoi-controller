@@ -17,6 +17,8 @@ return [
 
     'days_to_keep_products' => env('DAYS_TO_KEEP_PRODUCTS', 7),
 
+    'days_to_keep_logs' => env('DAYS_TO_KEEP_LOGS', 7),
+
     'enabled_pan_plugins' => env('ENABLED_PAN_PLUGINS', ''),
 
     'python_client_path' => env('NWWSOI_PYTHON_CLIENT_PATH', '/usr/bin/python3 -u scripts/nwws.py'),
