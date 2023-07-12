@@ -11,7 +11,7 @@
             if (buttonText == ' Stop') {
                 actionText = 'Stopping';
             }
-            console.log(`buttonText = ${buttonText}`);
+            // console.log(`buttonText = ${buttonText}`);
             Swal.fire({
                 html: `<h5><i class="fa-solid fa-spinner fa-spin-pulse"></i> ${actionText}...</h5>`,
                 showConfirmButton: false,
