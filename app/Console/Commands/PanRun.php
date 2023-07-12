@@ -47,8 +47,8 @@ class PanRun extends Command
             return 1;
         }
         // Send product to all enabled PAN plugins
-        if (!is_null(config('nwwsoi-controller.enabled-pan-plugins'))) {
-            foreach (explode(',', config('nwwsoi-controller.enabled-pan-plugins')) as $panPlugin) {
+        if (!is_null(config('nwwsoi-controller.enabled_pan_plugins'))) {
+            foreach (explode(',', config('nwwsoi-controller.enabled_pan_plugins')) as $panPlugin) {
                 $exitCode = Artisan::call($panPlugin, [
                     'productFile' => $productFile,
                 ]);
