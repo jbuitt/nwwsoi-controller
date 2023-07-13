@@ -51,6 +51,7 @@ class PanRun extends Command
             foreach (explode(',', config('nwwsoi-controller.enabled_pan_plugins')) as $panPlugin) {
                 $exitCode = Artisan::call($panPlugin, [
                     'productFile' => $productFile,
+                    'client' => 'sleekxmpp',
                 ]);
                 if ($exitCode !== 0) {
                     print "There was an error calling $panPlugin.\n";
