@@ -12,6 +12,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        // Snapshot data for Horizon
+        $schedule
+            ->command('horizon:snapshot')
+            ->everyFiveMinutes();
+
         // Prune telescope entries
         $schedule
             ->command('telescope:prune')

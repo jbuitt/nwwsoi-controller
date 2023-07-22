@@ -34,6 +34,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/logs', function () {
+        return redirect('/log-viewer');
+    })->name('app-logs.view');
+    Route::get('/horizon', function() {
+        return redirect('/horizon');
+    })->name('horizon');
+    Route::get('/telescope', function() {
+        return redirect('/telescope');
+    })->name('telescope');
 });
 
 require __DIR__.'/auth.php';
