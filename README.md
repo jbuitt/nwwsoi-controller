@@ -92,7 +92,7 @@ docker compose up -d
 You'll need an admin user to log into the dashboard, create one first by running:
 
 ```
-./vendor/bin/sail artisan emwin-controller:create_admin_user
+./vendor/bin/sail artisan nwwsoi-controller:create_admin_user
 ```
 
 ## .env Environment Variables
