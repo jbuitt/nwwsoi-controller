@@ -48,7 +48,7 @@ class ProductTable extends DataTableComponent
         // Set default sorting status for created_at
         $this->setDefaultSort('created_at', 'desc');
         // Set empty message
-        $this->setEmptyMessage('No products found');
+        $this->setEmptyMessage('No products have been downloaded yet. Click the Start button to start downloading products');
     }
 
     public function columns(): array
