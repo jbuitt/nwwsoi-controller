@@ -43,7 +43,7 @@ docker compose build
 docker run --rm --interactive --tty \
   --volume $PWD:/var/www/html \
   --entrypoint /usr/local/bin/install_php_deps.sh \
-  sail-8.2/app:latest
+  nwwsoi-controller:latest
 ```
 
 4. Copy the `.env.example` file to `.env` and make your environment variable changes (documented below).
@@ -54,7 +54,7 @@ docker run --rm --interactive --tty \
 docker run --rm --interactive --tty \
   --volume $PWD:/var/www/html \
   --entrypoint /var/www/html/artisan \
-  sail-8.2/app:latest \
+  nwwsoi-controller:latest \
   key:generate
 ```
 
@@ -64,7 +64,7 @@ docker run --rm --interactive --tty \
 docker run --rm --interactive --tty \
   --volume $PWD:/var/www/html \
   --entrypoint /usr/local/bin/install_fe_deps.sh \
-  sail-8.2/app:latest
+  nwwsoi-controller:latest
 ```
 
 7. Next, download the other containers and start everything up by running:
@@ -76,8 +76,7 @@ docker compose up -d
 8. Now, you migrate and seed the database:
 
 ```
-docker compose exec -it nwwsoi-controller \
-   /var/www/html/artisan migrate \
+./vendor/bin/sail artisan migrate \
    --seed \
    --force
 ```
