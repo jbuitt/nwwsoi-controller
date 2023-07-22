@@ -70,7 +70,7 @@ docker run --rm --interactive --tty \
 7. Next, download the other containers and start everything up by running:
 
 ```
-docker compose up -d
+./vendor/bin/sail up -d
 ```
 
 8. Now, you migrate and seed the database:
