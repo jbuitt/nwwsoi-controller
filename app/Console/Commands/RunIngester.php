@@ -58,6 +58,7 @@ class RunIngester extends Command
         }
         // Set the WxIngest Base URL env var
         $procEnvVars['WXINGEST_BASE_URL'] = config('nwwsoi-controller.wxingest.base_url');
+        $procEnvVars['APP_ENV'] = config('app.env');
         //Log::debug(json_encode($procEnvVars));
         // Process is not already running, attempt to start it and append output to log
         if (config('nwwsoi-controller.python_client_path') !== '') {
