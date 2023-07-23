@@ -42,6 +42,7 @@ class PanRun extends Command
             ]);
             // Broadcast new product arrived event
             broadcast(new NewProductArrived($product))->via('pusher');
+            print "Product successfully inventoried. \n";
         } catch (QueryException $e) {
             print "Error: Could not inventory product: " . $e->getMessage() . "\n";
             return 1;
@@ -55,6 +56,8 @@ class PanRun extends Command
                 ]);
                 if ($exitCode !== 0) {
                     print "There was an error calling $panPlugin.\n";
+                } else {
+                    print "Successfully ran " . $panPlugin . ". \n";
                 }
             }
         }
