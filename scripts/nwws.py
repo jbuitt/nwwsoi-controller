@@ -213,7 +213,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
                     try:
                         result = subprocess.run(os.environ.get('NWWSOI_PAN_RUN') + ' ' + pathtofile, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True)
                         logging.info('Successfully executed PAN_RUN command. Output:')
-                        logging.info(' ' + result.stdout.decode('utf-8').strip('\n'))
+                        logging.info(' ' + result.stdout.decode('utf-8').replace('\n', ', '))
                     except subprocess.CalledProcessError as e:
                         logging.error('Failed to execute PAN_RUN command:')
                         logging.error(' {}'.format(e.output).encode())
