@@ -18,9 +18,11 @@ class Kernel extends ConsoleKernel
             ->everyFiveMinutes();
 
         // Prune telescope entries
-        $schedule
-            ->command('telescope:prune')
-            ->daily();
+        if ($this->app->environment('local')) {
+            $schedule
+                ->command('telescope:prune')
+                ->daily();
+        }
 
         // Purge old products files
         $schedule
