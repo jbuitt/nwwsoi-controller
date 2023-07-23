@@ -16,7 +16,7 @@ from datetime import datetime
 from xml.dom import minidom
 
 # Setup logging.
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s] ' + os.environ.get('APP_ENV') + '.%(levelname)s: %(message)s', filename='storage/logs/nwws-' + datetime.utcnow().strftime("%Y-%m-%d") + '.log')
+logging.basicConfig(level=logging.INFO, format='[%(asctime)s] ' + os.environ.get('APP_ENV') + '.%(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', filename='storage/logs/nwws-' + datetime.utcnow().strftime("%Y-%m-%d") + '.log')
 
 logging.info('Starting NWWS-OI Python client by Jim Buitt <jbuitt@gmail.com>')
 
