@@ -166,43 +166,23 @@ class MUCBot(sleekxmpp.ClientXMPP):
         if awipsid:
             dayhourmin = datetime.utcnow().strftime("%d%H%M")
             filename = cccc + '_' + ttaaii + '-' + awipsid + '.' + dayhourmin + '_' + id + '.txt'
-            # If user specified NWWSOI_FILE_SAVE_REGEX, check to see if filename matches supplied regex
-            if not os.environ.get('NWWSOI_FILE_SAVE_REGEX') == None:
-                if not re.fullmatch(os.environ.get('NWWSOI_FILE_SAVE_REGEX'), filename) == None:
-                    logging.info("Writing " + filename)
-                    if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
-                        os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
-                    # Remove every other line
-                    lines = content.splitlines()
-                    pathtofile = os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename
-                    f = open(pathtofile, 'w')
-                    count = 0
-                    for line in lines:
-                        if count == 0 and line == '':
-                            continue
-                        if count % 2 == 0:
-                            f.write(line + "\n")
-                        count += 1
-                    f.close()
-                else:
-                    logging.info("Not writing " + filename + ", since it did not match NWWSOI_FILE_SAVE_REGEX.")
-            else:
-                logging.info("Writing " + filename)
-                if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
-                    os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
-                # Remove every other line
-                lines = content.splitlines()
-                pathtofile = os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename
-                f = open(pathtofile, 'w')
-                count = 0
-                for line in lines:
-                    if count == 0 and line == '':
-                        continue
-                    if count % 2 == 0:
-                        f.write(line + "\n")
-                    count += 1
-                f.close()
-            # Run a product arrival notification command using the file as the parameter (if pan_run is defined as an environment variable)
+            # Write out product to a temporary file
+            logging.info("Writing " + filename)
+            if not os.path.exists('/tmp/nwws/'):
+                os.makedirs('/tmp/nwws/')
+            # Remove every other line
+            lines = content.splitlines()
+            pathtofile = '/tmp/nwws/' + filename
+            f = open(pathtofile, 'w')
+            count = 0
+            for line in lines:
+                if count == 0 and line == '':
+                    continue
+                if count % 2 == 0:
+                    f.write(line + "\n")
+                count += 1
+            f.close()
+            # Run a product arrival notification command using the product file as the parameter (if pan_run is defined as an environment variable)
             if not os.environ.get('NWWSOI_PAN_RUN') == None and not os.environ.get('NWWSOI_PAN_RUN') == "":
                 try:
                     result = subprocess.run(os.environ.get('NWWSOI_PAN_RUN') + ' ' + pathtofile, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True)
@@ -211,6 +191,24 @@ class MUCBot(sleekxmpp.ClientXMPP):
                 except subprocess.CalledProcessError as e:
                     logging.error('Failed to execute PAN_RUN command:')
                     logging.error(' {}'.format(e.output).encode())
+            # If user specified NWWSOI_FILE_SAVE_REGEX, check to see if filename matches supplied regex
+            if not os.environ.get('NWWSOI_FILE_SAVE_REGEX') == None:
+                if not re.fullmatch(os.environ.get('NWWSOI_FILE_SAVE_REGEX'), filename) == None:
+                    # Make sure destination directory exists
+                    if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
+                        os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
+                    # Move product to destination directory
+                    os.rename('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
+                else:
+                    logging.info("Not saving " + filename + ", since it did not match NWWSOI_FILE_SAVE_REGEX.")
+                    os.remove('/tmp/nwws/' + filename)
+            else:
+                # No file save regex supplied, default to writing out product
+                # Make sure destination directory exists
+                if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
+                    os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
+                # Move product to destination directory
+                os.rename('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
 
     def muc_online(self, presence):
         """
