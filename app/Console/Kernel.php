@@ -24,6 +24,11 @@ class Kernel extends ConsoleKernel
                 ->daily();
         }
 
+        // Create new date-based log file that nwws.py uses to write logs
+        $schedule
+            ->command('nwwsoi-controller:update_nwws_log_file')
+            ->daily();
+
         // Purge old products files
         $schedule
             ->command('nwwsoi-controller:purge_old_products ' . config('nwwsoi-controller.days_to_keep_products'))
