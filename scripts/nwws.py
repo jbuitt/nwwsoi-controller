@@ -7,6 +7,7 @@ import os
 import logging
 import json
 import time
+import shutil
 import sleekxmpp
 import socket
 import ssl
@@ -198,9 +199,9 @@ class MUCBot(sleekxmpp.ClientXMPP):
                     if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
                         os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
                     # Move product to destination directory
-                    os.rename('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
+                    shutil.move('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
                 else:
-                    logging.info("Not saving " + filename + ", since it did not match NWWSOI_FILE_SAVE_REGEX.")
+                    # logging.info("Not saving " + filename + ", since it did not match NWWSOI_FILE_SAVE_REGEX.")
                     os.remove('/tmp/nwws/' + filename)
             else:
                 # No file save regex supplied, default to writing out product
@@ -208,7 +209,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
                 if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
                     os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
                 # Move product to destination directory
-                os.rename('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
+                shutil.move('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
 
     def muc_online(self, presence):
         """

@@ -33,6 +33,7 @@ class PanRun extends Command
         $productFile = $this->argument('productFile');
         // Check product file name to see if it matches file save regex
         if (!preg_match('/' . config('nwwsoi-controller.nwwsoi.file_save_regex') . '/', basename($productFile))) {
+            print "Product filename did not match FILE_SAVE_REGEX, skipping.\n";
             return 0;
         }
         // File save regex matches, continue to Inventory product
