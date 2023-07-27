@@ -163,7 +163,6 @@ class MUCBot(sleekxmpp.ClientXMPP):
         awipsid = itemlist[0].attributes['awipsid'].value.lower()
         id = itemlist[0].attributes['id'].value
         content = itemlist[0].firstChild.nodeValue
-        file_written_flag = 0
         if awipsid:
             dayhourmin = datetime.utcnow().strftime("%d%H%M")
             filename = cccc + '_' + ttaaii + '-' + awipsid + '.' + dayhourmin + '_' + id + '.txt'
@@ -185,7 +184,6 @@ class MUCBot(sleekxmpp.ClientXMPP):
                             f.write(line + "\n")
                         count += 1
                     f.close()
-                    file_written_flag = 1
                 else:
                     logging.info("Not writing " + filename + ", since it did not match NWWSOI_FILE_SAVE_REGEX.")
             else:
@@ -204,19 +202,15 @@ class MUCBot(sleekxmpp.ClientXMPP):
                         f.write(line + "\n")
                     count += 1
                 f.close()
-                file_written_flag = 1
-
-            # If file was written out, check to see if a PAN_RUN script needs to be run
-            if file_written_flag == 1:
-                # Run a command using the file as the parameter (if pan_run is defined as an environment variable)
-                if not os.environ.get('NWWSOI_PAN_RUN') == None and not os.environ.get('NWWSOI_PAN_RUN') == "":
-                    try:
-                        result = subprocess.run(os.environ.get('NWWSOI_PAN_RUN') + ' ' + pathtofile, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True)
-                        logging.info('Successfully executed PAN_RUN command. Output:')
-                        logging.info(' ' + result.stdout.decode('utf-8').replace('\n', ' '))
-                    except subprocess.CalledProcessError as e:
-                        logging.error('Failed to execute PAN_RUN command:')
-                        logging.error(' {}'.format(e.output).encode())
+            # Run a product arrival notification command using the file as the parameter (if pan_run is defined as an environment variable)
+            if not os.environ.get('NWWSOI_PAN_RUN') == None and not os.environ.get('NWWSOI_PAN_RUN') == "":
+                try:
+                    result = subprocess.run(os.environ.get('NWWSOI_PAN_RUN') + ' ' + pathtofile, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True)
+                    logging.info('Successfully executed PAN_RUN command. Output:')
+                    logging.info(' ' + result.stdout.decode('utf-8').replace('\n', ' '))
+                except subprocess.CalledProcessError as e:
+                    logging.error('Failed to execute PAN_RUN command:')
+                    logging.error(' {}'.format(e.output).encode())
 
     def muc_online(self, presence):
         """
