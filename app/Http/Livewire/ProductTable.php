@@ -14,36 +14,14 @@ class ProductTable extends DataTableComponent
 
     public function configure(): void
     {
-        // Configure row clicks the Laravel Livewire Modal way
-        // $this->setPrimaryKey('id')
-        //     ->setTableRowUrl(function($row) {
-        //         return '#';
-        //     })
-        //     ->setTrAttributes(function($row, $index) {
-        //         return [
-        //             'onClick' => "Livewire.emit('openModal', 'view-product', {\"product\":\"$row->id\"})",
-        //         ];
-        //     });
-        // Configure row clicks the Tailwind Modal way
-        // $this->setPrimaryKey('id')
-        //     ->setTableRowUrl(function($row) {
-        //         return '#';
-        //     })
-        //     ->setTrAttributes(function($row, $index) {
-        //         return [
-        //             'data-modal-target' => 'productModal',
-        //             'data-modal-toggle' => 'productModal',
-        //             'data-product-id' => $row->id,
-        //             'onClick' => "Livewire.emit('loadProductContent', " . $row->id . ");",
-        //         ];
-        //     });
-        // Configure row clicks the new window way
+        // Open products in a new window
         $this->setPrimaryKey('id')
             ->setTableRowUrl(function($row) {
-                return route('view-product', $row);
-            })
-            ->setTableRowUrlTarget(function($row) {
-                return 'newwin';
+                return '#';
+            })->setTrAttributes(function($row, $index) {
+                return [
+                    'onClick' => "window.open('/view-product/{$row->id}', '_blank', \"popup=yes,width=800,height=750\")",
+                ];
             });
         // Set default sorting status for created_at
         $this->setDefaultSort('created_at', 'desc');
@@ -70,8 +48,6 @@ class ProductTable extends DataTableComponent
                 ),
             Column::make("Created at", "created_at")
                 ->sortable(),
-            // Column::make("Updated at", "updated_at")
-            //     ->sortable(),
         ];
     }
 
