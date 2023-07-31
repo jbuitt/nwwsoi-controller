@@ -3,7 +3,7 @@
         <i class="fa-solid {{ $buttonIconClass }}"></i>
         <span id="controlButton" class="px-2">{{ $buttonLabel }}</span>
     </button>
-    <span class="px-4 float-right">Process Status: <b>{{ $processStatus }}</b></span>
+    <span class="px-4 float-right text-gray-800 dark:text-white">Process Status: <b>{{ $processStatus }}</b></span>
     <script>
         document.getElementById('controlButton').addEventListener('click', function(e) {
             let buttonText = document.getElementById('controlButton').innerText;
