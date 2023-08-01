@@ -60,7 +60,7 @@ def sigterm_handler(signal, frame):
 def sigusr1_handler(signal, frame):
     logging.info('Caught USR1 signal, updating log file.')
     filehandler = logging.FileHandler('storage/logs/nwws-' + datetime.utcnow().strftime("%Y-%m-%d") + '.log', 'a')
-    formatter = logging.Formatter('[%(asctime)s] ' + os.environ.get('APP_ENV') + '.%(levelname)s: %(message)s')
+    formatter = logging.Formatter('[%(asctime)s] ' + os.environ.get('APP_ENV') + '.%(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     filehandler.setFormatter(formatter)
     log = logging.getLogger()  # root logger - Good to get it only once.
     for hdlr in log.handlers[:]:  # remove the existing file handlers
