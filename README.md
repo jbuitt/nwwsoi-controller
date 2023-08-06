@@ -3,7 +3,7 @@
 
 This software provides a download client and web dashboard for downloading "products" from NWWS-OI ([NOAA Weather Wire - Open Interface](https://www.nws.noaa.gov/nwws/). NOAA Weather Wire is a satellite data collection and dissemination system operated by the [National Weather Service](http://weather.gov). Its purpose is to provide state and federal government, commercial users, media and private citizens with timely delivery of meteorological, hydrological, climatological and geophysical information.
 
-This client was developed and tested on [Ubuntu 22.04](http://ubuntu.com) using the following open-source software stack:
+This client was developed and tested on [Ubuntu 22.04](http://ubuntu.com) (64-bit) and Raspberry Pi OS (64-bit) using the following open-source software stack:
 
 * [Docker](https://www.docker.com/) - Container tool
 * [Docker Compose](https://docs.docker.com/compose/) - Multi-container orchestration tool
