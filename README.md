@@ -21,6 +21,8 @@ This client was developed and tested on [Ubuntu 22.04](http://ubuntu.com) (64-bi
 
 ## How do I run it?
 
+*Please see the disclaimer below if you wish to run this software on a Raspberry Pi.*
+
 Asuming you already have Docker and Docker Compose [installed](https://github.com/jbuitt/nwwsoi-controller/blob/main/scripts/install_docker.sh), just following the instructions below:
 
 1. First, clone the repo and change directory:
@@ -94,6 +96,12 @@ You'll need an admin user to log into the dashboard, create one first by running
 ```
 ./vendor/bin/sail artisan nwwsoi-controller:create_admin_user
 ```
+
+## Running on a Raspberry Pi
+
+If you would like to run this software on a Raspberry Pi, I recommend using a Raspberry Pi 4 Model B with either 4 or 8 GB of
+memory booting from a quality solid-state drive. Running on a Pi Zero, 1, or 3 -or- booting from a MicroSD card is *not*
+recommended due to the poor performance you're likely to have.
 
 ## .env Environment Variables
 
