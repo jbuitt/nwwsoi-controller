@@ -21,12 +21,6 @@ services:
             - '.:/var/www/html'
         networks:
             - sail
-    # adminer:
-    #     image: adminer
-    #     ports:
-    #         - '${DB_ADMIN_PORT:-18080}:8080'
-    #     networks:
-    #         - sail
     soketi:
         image: 'quay.io/soketi/soketi:latest-16-alpine'
         environment:
