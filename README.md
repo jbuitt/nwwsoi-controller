@@ -39,13 +39,14 @@ source sail.env
 docker compose build
 ```
 
-3. Now, install the PHP dependencies:
+3. Now, install all the PHP dependencies:
 
 ```
 docker run --rm --interactive --tty \
+  -e WWWUSER=$(id -u) \
   --volume $PWD:/var/www/html \
-  --entrypoint /usr/local/bin/install_php_deps.sh \
-  nwwsoi-controller:latest
+  nwwsoi-controller:latest \
+  composer install -ovn 
 ```
 
 4. Copy the `.env.example` file to `.env` and make your environment variable changes (documented below).
@@ -54,19 +55,26 @@ docker run --rm --interactive --tty \
 
 ```
 docker run --rm --interactive --tty \
+  -e WWWUSER=$(id -u) \
   --volume $PWD:/var/www/html \
-  --entrypoint /var/www/html/artisan \
   nwwsoi-controller:latest \
-  key:generate
+  ./artisan key:generate 
 ```
 
 6. Now, install the front-end dependencies:
 
 ```
 docker run --rm --interactive --tty \
+  -e WWWUSER=$(id -u) \
   --volume $PWD:/var/www/html \
-  --entrypoint /usr/local/bin/install_fe_deps.sh \
-  nwwsoi-controller:latest
+  nwwsoi-controller:latest \
+  npm i 
+
+docker run --rm --interactive --tty \
+  -e WWWUSER=$(id -u) \
+  --volume $PWD:/var/www/html \
+  nwwsoi-controller:latest \
+  npm run build 
 ```
 
 7. Next, download the other containers and start everything up by running:
