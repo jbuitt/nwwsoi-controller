@@ -42,14 +42,20 @@ cp docker-compose-minimal.yml docker-compose.yml
 cp docker-compose-full.yml docker-compose.yml   # usually what you want
 ```
 
-3. Next, source the env file and build all of the Docker images:
+3. Copy the example env file to the file to source in the next step:
+
+```
+cp sail.env.example sail.env
+```
+
+4. Next, source the env file and build all of the Docker images:
 
 ```
 source sail.env
 docker compose build
 ```
 
-4. Now, install all the PHP dependencies:
+5. Now, install all the PHP dependencies:
 
 ```
 docker run --rm --interactive --tty \
@@ -59,9 +65,9 @@ docker run --rm --interactive --tty \
   composer install -ovn 
 ```
 
-5. Copy the `.env.example` file to `.env` and make your environment variable changes (documented below).
+6. Copy the `.env.example` file to `.env` and make your environment variable changes (documented below).
    
-6. Create an Laravel App Key:
+7. Create an Laravel App Key:
 
 ```
 docker run --rm --interactive --tty \
@@ -71,7 +77,7 @@ docker run --rm --interactive --tty \
   ./artisan key:generate --force
 ```
 
-7. Now, install the front-end dependencies:
+8. Now, install the front-end dependencies:
 
 ```
 docker run --rm --interactive --tty \
@@ -87,13 +93,13 @@ docker run --rm --interactive --tty \
   npm run build 
 ```
 
-8. Next, download the other containers and start everything up by running:
+9. Next, download the other containers and start everything up by running:
 
 ```
 ./vendor/bin/sail up -d
 ```
 
-9. Now, you migrate and seed the database:
+10. Now, you migrate and seed the database:
 
 ```
 ./vendor/bin/sail artisan migrate \
@@ -101,13 +107,13 @@ docker run --rm --interactive --tty \
    --force
 ```
 
-10. Create the symbolic link so the web server has access to files in the storage directory:
+11. Create the symbolic link so the web server has access to files in the storage directory:
 
 ```
 ./vendor/bin/sail artisan storage:link
 ```
 
-11. Finally, you can access the dashboard from a browser by going to [http://127.0.0.1:8080](http://127.0.0.1:8080).
+12. Finally, you can access the dashboard from a browser by going to [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
 You'll need an admin user to log into the dashboard, create one first by running:
 
