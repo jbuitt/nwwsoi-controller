@@ -28,7 +28,7 @@ Asuming you already have Docker and Docker Compose [installed](https://github.co
 1. First, clone the repo and change directory:
 
 ```
-git clone https://github.com/jbuitt/nwwsoi-controller
+git clone https://github.com/jbuitt/nwwsoi-controller.git
 cd nwwsoi-controller/
 ```
 
