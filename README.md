@@ -37,7 +37,7 @@ cd nwwsoi-controller/
 ```
 cp docker-compose-minimal.yml docker-compose.yml
 
-or
+# or
 
 cp docker-compose-full.yml docker-compose.yml   # usually what you want
 ```
