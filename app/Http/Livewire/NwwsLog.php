@@ -13,8 +13,9 @@ class NwwsLog extends Component
         $logFile = base_path() . '/storage/logs/nwws-' . date('Y-m-d') . '.log';
         if (file_exists($logFile)) {
             $this->lastTenLogLines = shell_exec('tail ' . $logFile);
+        } else {
+            $this->lastTenLogLines = 'The file ' . $logFile . ' was not found.<br /><br /><br /><br /><br /><br /><br /><br /><br />';
         }
-        $this->lastTenLogLines = 'The file ' . $logFile . ' was not found.<br /><br /><br /><br /><br /><br /><br /><br /><br />';
     }
 
     public function render()
