@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -10,7 +10,7 @@ class ProductTable extends DataTableComponent
 {
     protected $model = Product::class;
 
-    protected $listeners = ['productAdded'];
+    protected $listeners = ['productAdded' => '$refresh'];
 
     public function configure(): void
     {
@@ -64,11 +64,6 @@ class ProductTable extends DataTableComponent
     public function getWfo($row, $column)
     {
         return strtoupper(substr($row->name, 0, 4));
-    }
-
-    public function productAdded()
-    {
-        $this->emit('refreshDatatable');
     }
 
 }

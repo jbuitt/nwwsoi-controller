@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use LivewireUI\Modal\ModalComponent;
 use App\Models\Product;

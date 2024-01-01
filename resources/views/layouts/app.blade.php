@@ -13,7 +13,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
         @livewireStyles
+        @livewireScripts
     </head>
     <body class="font-sans antialiased">
         <style>
@@ -42,6 +44,5 @@
                <livewire:nwws-log />
             </footer>
         </div>
-        @livewireScripts
     </body>
 </html>
