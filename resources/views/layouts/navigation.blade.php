@@ -48,6 +48,10 @@
 
                         <x-dropdown-divider />
 
+                        <x-dropdown-link :href="route('pulse')" target="_newwin">
+                            {{ __('Pulse') }} </i> &nbsp; <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </x-dropdown-link>
+
                         <x-dropdown-link :href="route('horizon')" target="_newwin">
                             {{ __('Horizon') }} &nbsp; <i class="fa-solid fa-arrow-up-right-from-square"></i>
                         </x-dropdown-link>
