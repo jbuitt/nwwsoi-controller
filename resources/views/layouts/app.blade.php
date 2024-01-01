@@ -36,12 +36,10 @@
                 {{ $slot }}
             </main>
 
-            <br /><br /><br />
-
-            <footer id="footer" class="w-full bg-gray-100 dark:bg-gray-700 text-black dark:text-white static bottom-0 p-2">
-<code class="font-mono whitespace-pre">
-<livewire:nwws-log />
-</code>
+        </div>
+        <div class="w-full h-8 bg-gray-100 dark:bg-gray-700 text-black dark:text-white static bottom-0 p-2">
+            <footer id="footer">
+               <livewire:nwws-log />
             </footer>
         </div>
         @livewireScripts
