@@ -41,7 +41,7 @@ class ProcessControlPanel extends Component
             $this->processStatus = 'Error';
             // $this->processResult = 'Invalid config command';
         }
-        $this->dispatchBrowserEvent('commandFinished');
+        $this->dispatch('commandFinished');
     }
 
     /**
