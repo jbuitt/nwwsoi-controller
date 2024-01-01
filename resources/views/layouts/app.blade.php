@@ -19,7 +19,7 @@
         <style>
             [x-cloak] { display: none !important; }
         </style>
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -35,6 +35,14 @@
             <main>
                 {{ $slot }}
             </main>
+
+            <br /><br /><br />
+
+            <footer id="footer" class="w-full bg-gray-100 dark:bg-gray-700 text-black dark:text-white static bottom-0 p-2">
+<code class="font-mono whitespace-pre">
+<livewire:nwws-log />
+</code>
+            </footer>
         </div>
         @livewireScripts
     </body>
