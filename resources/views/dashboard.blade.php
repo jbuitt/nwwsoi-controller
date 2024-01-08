@@ -1,7 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ config('app.name') . ' Dashboard' }}
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight grid grid-cols-2">
+            <span>{{ config('app.name') . ' Dashboard' }}</span>
+            <span id="dateTimeSpan" class="text-right text-black dark:text-white w-full font-mono">Loading..</span>
         </h2>
     </x-slot>
 
@@ -15,5 +16,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+        window.addEventListener("load", function() {
+            window.setInterval(function() {
+                document.getElementById('dateTimeSpan').textContent = window.moment.utc().format('YYYY-MM-DD HH:mm:ss');
+            }, 1000);
+        });
+    </script>
 
 </x-app-layout>

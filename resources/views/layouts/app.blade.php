@@ -21,7 +21,7 @@
         <style>
             [x-cloak] { display: none !important; }
         </style>
-        <div class="bg-gray-100 dark:bg-gray-900">
+        <div class="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 justify-between">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -34,15 +34,14 @@
             @endif
 
             <!-- Page Content -->
-            <main>
+            <main class="mb-auto">
                 {{ $slot }}
             </main>
 
-        </div>
-        <div class="w-full h-48 bg-gray-100 dark:bg-gray-700 text-black dark:text-white static bottom-0 p-2">
-            <footer id="footer">
-               <livewire:nwws-log />
+            <footer id="footer" class="w-full h-64 bg-gray-100 dark:bg-gray-700 text-black dark:text-white static bottom-0 p-2">
+                <livewire:nwws-log />
             </footer>
+
         </div>
     </body>
 </html>
