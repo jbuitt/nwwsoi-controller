@@ -21,7 +21,7 @@
         <style>
             [x-cloak] { display: none !important; }
         </style>
-        <div class="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 justify-between">
+        <div class="flex flex-col bg-gray-100 dark:bg-gray-900 justify-between">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
