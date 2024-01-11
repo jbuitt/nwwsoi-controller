@@ -24,7 +24,7 @@ return [
         'port' => env('NWWSOI_SERVER_PORT', 5222),
         'username' => env('NWWSOI_USERNAME', ''),
         'password' => env('NWWSOI_PASSWORD', ''),
-        'resource' => env('NWWSOI_RESOURCE', 'SleekXMPP_Client'),
+        'resource' => env('NWWSOI_RESOURCE', 'SliXMPP_Client'),
         'archivedir' => env('NWWSOI_ARCHIVE_DIR', 'app/public/products/nwws'),
         'pan_run' => env('NWWSOI_PAN_RUN', 'artisan nwwsoi-controller:pan-run'),
         'retry' => env('NWWSOI_SERVER_CONNECT_RETRY', 1),

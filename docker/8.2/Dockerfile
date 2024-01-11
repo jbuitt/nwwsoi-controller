@@ -46,11 +46,7 @@ RUN apt-get update \
 
 # Custom packages needed for nwwsoi-controller
 RUN apt-get update \
-    && apt-get install -y python3-sleekxmpp curl jq
-
-# Fix Python 3.10 collection issue
-RUN sed -i.orig 's/^import collections/import collections.abc/' /usr/lib/python3/dist-packages/sleekxmpp/thirdparty/orderedset.py
-RUN sed -i.orig 's/^class OrderedSet(collections.MutableSet):/class OrderedSet(collections.abc.MutableSet):/' /usr/lib/python3/dist-packages/sleekxmpp/thirdparty/orderedset.py
+    && apt-get install -y python3-urllib3 python3-slixmpp curl jq
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 

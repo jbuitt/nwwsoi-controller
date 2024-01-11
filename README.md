@@ -17,7 +17,7 @@ This client was developed and tested on [Ubuntu 22.04](http://ubuntu.com) (64-bi
 * [MySQL](https://www.mysql.com/) - Relational Database
 * [Redis](https://redis.io/) - Cache
 * [Soketi](https://docs.soketi.app/) - Websocket server
-* [SleekXMPP](https://github.com/fritzy/SleekXMPP) - XMPP client 
+* [SliXMPP](https://github.com/poezio/slixmpp) - XMPP client 
 
 ## How do I run it?
 

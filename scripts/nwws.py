@@ -8,7 +8,7 @@ import logging
 import json
 import time
 import shutil
-import sleekxmpp
+import slixmpp
 import socket
 import ssl
 import re
@@ -28,7 +28,7 @@ with open('./storage/logs/nwws.pid', 'w') as f:
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout SliXMPP, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
     reload(sys)
@@ -74,16 +74,16 @@ signal.signal(signal.SIGINT, sigint_handler)
 signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGUSR1, sigusr1_handler)
 
-class MUCBot(sleekxmpp.ClientXMPP):
+class MUCBot(slixmpp.ClientXMPP):
 
     """
-    A simple SleekXMPP bot that will greets those
+    A simple SliXMPP bot that will greets those
     who enter the room, and acknowledge any messages
     that mentions the bot's nickname.
     """
 
     def __init__(self, jid, password, room, nick):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.room = room
         self.nick = nick
@@ -109,7 +109,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
         self.add_event_handler("muc::%s::got_online" % self.room,
                                self.muc_online)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -122,13 +122,13 @@ class MUCBot(sleekxmpp.ClientXMPP):
                      event does not provide any additional
                      data.
         """
-        self.get_roster()
+        await self.get_roster()
         self.send_presence()
-        self.plugin['xep_0045'].joinMUC(self.room,
+        self.plugin['xep_0045'].join_muc(self.room,
                                         self.nick,
                                         # If a room password is needed, use:
                                         # password=the_room_password,
-                                        wait=True)
+                                        )
 
     def muc_message(self, msg):
         """
@@ -226,7 +226,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
         if presence['muc']['nick'] != self.nick:
             self.send_message(mto=presence['from'].bare,
                 mbody="Hello, %s %s" % (presence['muc']['role'],
-                    presence['muc']['nick']),
+                                        presence['muc']['nick']),
                 mtype='groupchat')
 
 
@@ -260,39 +260,34 @@ if __name__ == '__main__':
         # have interdependencies, the order in which you register them does
         # not matter.
         logging.info('Setting up MUCBot..')
-        xmpp = MUCBot(os.environ.get('NWWSOI_USERNAME') + '@'
-            + os.environ.get('NWWSOI_SERVER_HOST'), os.environ.get('NWWSOI_PASSWORD'), 'nwws@conference.'
-            + os.environ.get('NWWSOI_SERVER_HOST'), os.environ.get('NWWSOI_RESOURCE'))
+        xmpp = MUCBot(
+              os.environ.get('NWWSOI_USERNAME') + '@' + os.environ.get('NWWSOI_SERVER_HOST'), # JID
+              os.environ.get('NWWSOI_PASSWORD'),                                              # Password
+              'nwws@conference.' + os.environ.get('NWWSOI_SERVER_HOST'),                      # Room
+              os.environ.get('NWWSOI_RESOURCE'))                                              # Resource/Nickname
         xmpp.register_plugin('xep_0030') # Service Discovery
         xmpp.register_plugin('xep_0045') # Multi-User Chat
         xmpp.register_plugin('xep_0199') # XMPP Ping
 
-        # nwws-oi.weather.gov now requires TLSv2.3, will *not* connect without the following line
-        xmpp.ssl_version = ssl.PROTOCOL_SSLv23
-
         # Connect to the XMPP server and start processing XMPP stanzas.
         logging.info('Connecting to XMPP server..')
-        if xmpp.connect((os.environ.get('NWWSOI_SERVER_HOST'), os.environ.get('NWWSOI_SERVER_PORT')),
-            os.environ.get('NWWSOI_SERVER_CONNECT_RETRY'),
-            True,
-            False
-        ):
-            # If you do not have the dnspython library installed, you will need
-            # to manually specify the name of the server if it does not match
-            # the one in the JID. For example, to use Google Talk you would
-            # need to use:
-            #
-            # if xmpp.connect(('talk.google.com', 5222)):
-            #     ...
-            logging.info('Connected to XMPP server, starting to process incoming products.')
-            xmpp.process(block=True)
-            if os.path.isfile('/tmp/exit_nwws'):
-                os.remove('/tmp/exit_nwws')
-                logging.info('Exited.')
-                sys.exit(0)
-        else:
-            logging.error('Unable to connect.')
-            sys.exit(1)
+        xmpp.connect()
+
+        # If you do not have the dnspython library installed, you will need
+        # to manually specify the name of the server if it does not match
+        # the one in the JID. For example, to use Google Talk you would
+        # need to use:
+        #
+        # if xmpp.connect(('talk.google.com', 5222)):
+        #     ...
+        logging.info('Connected to XMPP server, starting to process incoming products.')
+        xmpp.process(forever=True)
+
+        # Check for file that signifies that the process should exit
+        if os.path.isfile('/tmp/exit_nwws'):
+            os.remove('/tmp/exit_nwws')
+            logging.info('Exited.')
+            sys.exit(0)
 
         logging.info('Sleeping for 5 seconds.')
         time.sleep(5)
