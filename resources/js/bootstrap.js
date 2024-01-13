@@ -47,7 +47,7 @@ var pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
 var channel = pusher.subscribe('events');
 channel.bind('App\\Events\\NewProductArrived', function(data) {
     console.log(`New product arrived: ${data.product.name}`);
-    Livewire.emit('productAdded');
+    Livewire.dispatch('productAdded');
 });
 
 // Import Sweet Alert
