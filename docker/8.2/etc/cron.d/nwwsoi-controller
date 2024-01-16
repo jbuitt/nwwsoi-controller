@@ -1,0 +1,1 @@
+* * * * * sail cd /var/www/html && ./artisan schedule:run >>/var/log/cron-nwwsoi-controller.log 2>&1

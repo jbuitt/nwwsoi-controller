@@ -53,6 +53,9 @@ RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 
+# Copy crontab for NWWSOI Controller
+COPY etc/cron.d/nwwsoi-controller /etc/cron.d/nwwsoi-controller
+
 COPY install_php_deps.sh /usr/local/bin/install_php_deps.sh
 COPY install_fe_deps.sh /usr/local/bin/install_fe_deps.sh
 COPY start-container /usr/local/bin/start-container
