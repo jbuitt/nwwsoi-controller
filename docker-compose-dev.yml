@@ -24,9 +24,9 @@ services:
         depends_on:
             - mysql
             - redis
-#            - meilisearch
             - mailpit
-#            - selenium
+            - soketi
+
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -51,12 +51,14 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
+
     adminer:
         image: adminer
         ports:
             - '${DB_ADMIN_PORT:-18080}:8080'
         networks:
             - sail
+
     redis:
         image: 'redis:alpine'
         ports:
@@ -72,23 +74,7 @@ services:
                 - ping
             retries: 3
             timeout: 5s
-#    meilisearch:
-#        image: 'getmeili/meilisearch:latest'
-#        ports:
-#            - '${FORWARD_MEILISEARCH_PORT:-27700}:7700'
-#        volumes:
-#            - 'sail-meilisearch:/meili_data'
-#        networks:
-#            - sail
-#        healthcheck:
-#            test:
-#                - CMD
-#                - wget
-#                - '--no-verbose'
-#                - '--spider'
-#                - 'http://localhost:7700/health'
-#            retries: 3
-#            timeout: 5s
+
     mailpit:
         image: 'axllent/mailpit:latest'
         ports:
@@ -96,14 +82,7 @@ services:
             - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
         networks:
             - sail
-#    selenium:
-#        image: selenium/standalone-chrome
-#        extra_hosts:
-#            - 'host.docker.internal:host-gateway'
-#        volumes:
-#            - '/dev/shm:/dev/shm'
-#        networks:
-#            - sail
+
     soketi:
         image: 'quay.io/soketi/soketi:latest-16-alpine'
         environment:
@@ -117,23 +96,24 @@ services:
             - '${SOKETI_METRICS_SERVER_PORT:-9601}:9601'
         networks:
             - sail
-    soketi-proxy:
-        image: nginx
-        ports:
-            - '${SOKETI_PROXY_PORT:-6002}:6002'
-        volumes:
-            - './docker/8.2/soketi-proxy.conf:/etc/nginx/conf.d/soketi-proxy.conf'
-        networks:
-            - sail
-        depends_on:
-            - soketi
+
+    # soketi-proxy:
+    #     image: nginx
+    #     ports:
+    #         - '${SOKETI_PROXY_PORT:-6002}:6002'
+    #     volumes:
+    #         - './docker/8.2/soketi-proxy.conf:/etc/nginx/conf.d/soketi-proxy.conf'
+    #     networks:
+    #         - sail
+    #     depends_on:
+    #         - soketi
+
 networks:
     sail:
         driver: bridge
+
 volumes:
     sail-mysql:
         driver: local
     sail-redis:
-        driver: local
-    sail-meilisearch:
         driver: local
