@@ -35,11 +35,11 @@ cd nwwsoi-controller/
 2. Copy the desired file you want Docker Compose to use.
 
 ```
-cp docker-compose-minimal.yml docker-compose.yml
+cp docker-compose-prod.yml docker-compose.yml
 
 # or
 
-cp docker-compose-full.yml docker-compose.yml   # usually what you want
+cp docker-compose-dev.yml docker-compose.yml   # usually what you want
 ```
 
 3. Copy the example env file to the file to source in the next step:

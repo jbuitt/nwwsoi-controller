@@ -1,0 +1,75 @@
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
+# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+stages:
+- sast
+- test
+- build
+- deploy
+sast:
+  stage: sast
+include:
+- template: Security/SAST.gitlab-ci.yml
+test:
+  stage: test
+  script:
+  - composer install -ovn
+  - cp .env.example .env
+  - cp docker-compose-full.yml docker-compose.yml
+  - cp sail.env.example sail.env
+  - sed -i'' 's/WWWUSER=1000/WWWUSER=1001/' sail.env
+  - sed -i'' 's/WWWGROUP=1000/WWWGROUP=1001/' sail.env
+  - source sail.env
+#  - ./vendor/bin/sail up -d
+#  - ./vendor/bin/sail artisan key:generate
+#  - ./vendor/bin/sail artisan migrate --seed
+#  - ./vendor/bin/sail artisan migrate --path database/migrations/library --seed --force --database=library --seeder=LibraryTablesSeeder
+#  - ./vendor/bin/sail artisan test
+#  - ./vendor/bin/sail down
+  - sudo /usr/bin/chown -R deployment:deployment *
+  only:
+  - dev
+  tags:
+  - wxnotify-docker
+build:
+  stage: build
+  script:
+  - composer install --prefer-dist --no-scripts -v -o
+  - npm i
+  - npm run build
+  after_script:
+  - echo "BUILD_JOB_ID=$CI_JOB_ID" >> job.env
+  artifacts:
+    reports:
+      dotenv: job.env
+    paths:
+    - ./
+    exclude:
+    - .git
+    - .git/**/*
+    expire_in: 1 day
+  tags:
+  - wxnotify-docker
+deploy:
+  stage: deploy
+  script:
+  - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - composer install --prefer-dist --no-scripts -v -o
+  - ./vendor/bin/envoy run deploy --commit="$CI_COMMIT_SHA" --token="$GITLAB_TOKEN"
+    --job="$BUILD_JOB_ID" --project="$CI_PROJECT_ID"
+  environment:
+    name: prod
+    url: https://nwwsoi-controller.wxnotify.com
+  only:
+  - main
+  tags:
+  - wxnotify-docker
+variables:
+  SAST_EXCLUDED_ANALYZERS: "nodejs-scan,semgrep,eslint"

@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Status endpoint
+Route::get('/status', function() {
+    return response()->json([
+        'statusCode' => 200,
+        'message' => 'OK',
+        'details' => [],
+    ], 200);
 });
