@@ -23,12 +23,11 @@ test:
   - sed -i'' 's/WWWUSER=1000/WWWUSER=1001/' sail.env
   - sed -i'' 's/WWWGROUP=1000/WWWGROUP=1001/' sail.env
   - source sail.env
-#  - ./vendor/bin/sail up -d
-#  - ./vendor/bin/sail artisan key:generate
-#  - ./vendor/bin/sail artisan migrate --seed
-#  - ./vendor/bin/sail artisan migrate --path database/migrations/library --seed --force --database=library --seeder=LibraryTablesSeeder
-#  - ./vendor/bin/sail artisan test
-#  - ./vendor/bin/sail down
+ - ./vendor/bin/sail up -d
+ - ./vendor/bin/sail artisan key:generate
+ - ./vendor/bin/sail artisan migrate --seed
+ - ./vendor/bin/sail artisan test
+ - ./vendor/bin/sail down
   - sudo /usr/bin/chown -R deployment:deployment *
   only:
   - dev
