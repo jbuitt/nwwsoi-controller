@@ -24,14 +24,10 @@
         echo 'NWWS-OI Controller - Changing directory to new release directory..'
         cd /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/
         echo 'NWWS-OI Controller - Downloading build artifacts..'
-        curl --progress-bar --header 'PRIVATE-TOKEN: {{ $token }}' {{ $gitlab_url }}/api/v4/projects/{{ $project }}/jobs/{{ $job }}/artifacts --output artifacts.zip
-        echo 'NWWS-OI Controller - Extracting build artifacts into /var/www/nwwsoi-controller{{ $i }}/releases/..'
-        unzip -qq artifacts.zip >/dev/null 2>&1
-        if [[ $? != 0 ]]; then
-            echo "Error: Artifacts file could not be unzipped."
-            exit 1
-        fi
-        rm -f artifacts.zip
+        curl --progress-bar --header 'PRIVATE-TOKEN: {{ $token }}' {{ $gitlab_url }}/api/v4/projects/{{ $project }}/jobs/{{ $job }}/artifacts --output /tmp/artifacts.zip
+        echo 'NWWS-OI Controller - Extracting build artifacts into /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/..'
+        unzip -qq /tmp/artifacts.zip >/dev/null 2>&1 || echo "Error: Artifacts file could not be unzipped."; exit 1
+        rm -f /tmp/artifacts.zip
     @endfor
 @endtask
 
