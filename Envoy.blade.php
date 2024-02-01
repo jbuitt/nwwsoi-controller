@@ -33,6 +33,7 @@
         fi
         rm -f /tmp/artifacts.zip
     @endfor
+    sleep 1
 @endtask
 
 @task('setup_new_env', $on_servers)
@@ -54,7 +55,10 @@
 @task('shutdown_old_docker', $on_servers)
     @for ($i=1; $i<=$num_controllers; $i++)
         echo 'NWWS-OI Controller - Changing directory to current directory..'
-        cd /var/www/nwwsoi-controller{{ $i }}/current{{ $i }}/
+        cd /var/www/nwwsoi-controller{{ $i }}/current/
+
+        echo 'NWWS-OI Controller - Exporting $COMPOSE_PROJECT_NAME..'
+        export COMPOSE_PROJECT_NAME=$(cat /var/www/nwwsoi-controller{{ $i }}/COMPOSE_PROJECT_NAME)
 
         echo 'NWWS-OI Controller - Shutting down current Docker containers..'
         source sail.env
@@ -63,14 +67,17 @@
         cd /var/www/nwwsoi-controller{{ $i }}/
 
         echo 'NWWS-OI Controller - Replace current release symlink..'
-        ln -nfs /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release}} /var/www/nwwsoi-controller{{ $i }}/current{{ $i }}
+        ln -nfs /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release}} /var/www/nwwsoi-controller{{ $i }}/current
     @endfor
 @endtask
 
 @task('startup_new_docker', $on_servers)
     @for ($i=1; $i<=$num_controllers; $i++)
         echo 'NWWS-OI Controller - Changing directory to current directory..'
-        cd /var/www/nwwsoi-controller{{ $i }}/current{{ $i }}/
+        cd /var/www/nwwsoi-controller{{ $i }}/current/
+
+        echo 'NWWS-OI Controller - Exporting $COMPOSE_PROJECT_NAME..'
+        export COMPOSE_PROJECT_NAME={{ $release }}
 
         echo 'NWWS-OI Controller - Starting new Docker containers..'
         source sail.env
@@ -87,20 +94,23 @@
         done
 
         echo 'NWWS-OI Controller - Running database migrations..'
-        docker exec current{{ $i }}-nwwsoi_controller-1 ./artisan migrate --seed --force --isolated
+        docker exec {{ $release }}-nwwsoi_controller-1 ./artisan migrate --seed --force --isolated
     @endfor
 @endtask
 
 @task('clean_up', $on_servers)
     @for ($i=1; $i<=$num_controllers; $i++)
         echo 'NWWS-OI Controller - Changing directory to current directory..'
-        cd /var/www/nwwsoi-controller{{ $i }}/current{{ $i }}/
+        cd /var/www/nwwsoi-controller{{ $i }}/current/
 
         echo "NWWS-OI Controller - Clearing bootstrapped files.."
-        docker exec current{{ $i }}-nwwsoi_controller-1 ./artisan optimize:clear
+        docker exec {{ $release }}-nwwsoi_controller-1 ./artisan optimize:clear
 
         echo "NWWS-OI Controller - Restart Queue Worker.."
-        docker exec current{{ $i }}-nwwsoi_controller-1 ./artisan queue:restart
+        docker exec {{ $release }}-nwwsoi_controller-1 ./artisan queue:restart
+
+        echo 'NWWS-OI Controller - Updating COMPOSE_PROJECT_NAME..'
+        echo {{ $release }} >/var/www/nwwsoi-controller{{ $i }}/COMPOSE_PROJECT_NAME
 
         echo 'NWWS-OI Controller - Removing old releases..'
         NUM_RELEASES=$(ls /var/www/nwwsoi-controller{{ $i }}/releases/ | wc -l)
