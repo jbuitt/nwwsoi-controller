@@ -26,7 +26,7 @@
         echo 'NWWS-OI Controller - Downloading build artifacts..'
         curl --progress-bar --header 'PRIVATE-TOKEN: {{ $token }}' {{ $gitlab_url }}/api/v4/projects/{{ $project }}/jobs/{{ $job }}/artifacts --output /tmp/artifacts.zip
         echo 'NWWS-OI Controller - Extracting build artifacts into /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/..'
-        unzip /tmp/artifacts.zip
+        /usr/bin/unzip -qq /tmp/artifacts.zip
         if [[ $? != 0 ]]; then
             echo "Error: Artifacts file could not be unzipped."
             exit 1
@@ -44,10 +44,10 @@
         cp /var/www/nwwsoi-controller{{ $i }}/persistent/.env .env
 
         echo "NWWS-OI Controller - Creating sail.env file.."
-        cp /var/www/nwwsoi-controller{{ $i }}/sail.env sail.env
+        cp /var/www/nwwsoi-controller{{ $i }}/persistent/sail.env sail.env
 
         echo "NWWS-OI Controller - Creating docker-compose.yml file.."
-        cp /var/www/nwwsoi-controller{{ $i }}/docker-compose.yml docker-compose.yml
+        cp /var/www/nwwsoi-controller{{ $i }}/persistent/docker-compose.yml docker-compose.yml
     @endfor
 @endtask
 
