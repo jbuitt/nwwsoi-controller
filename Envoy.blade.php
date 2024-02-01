@@ -87,7 +87,7 @@
         done
 
         echo 'NWWS-OI Controller - Running database migrations..'
-        docker exec current{{ $i }}-laravel.test-1 ./artisan migrate --seed --force --isolated
+        docker exec current{{ $i }}-nwwsoi_controller-1 ./artisan migrate --seed --force --isolated
     @endfor
 @endtask
 
@@ -97,10 +97,10 @@
         cd /var/www/nwwsoi-controller{{ $i }}/current{{ $i }}/
 
         echo "NWWS-OI Controller - Clearing bootstrapped files.."
-        docker exec current{{ $i }}-laravel.test-1 ./artisan optimize:clear
+        docker exec current{{ $i }}-nwwsoi_controller-1 ./artisan optimize:clear
 
         echo "NWWS-OI Controller - Restart Queue Worker.."
-        docker exec current{{ $i }}-laravel.test-1 ./artisan queue:restart
+        docker exec current{{ $i }}-nwwsoi_controller-1 ./artisan queue:restart
 
         echo 'NWWS-OI Controller - Removing old releases..'
         NUM_RELEASES=$(ls /var/www/nwwsoi-controller{{ $i }}/releases/ | wc -l)
