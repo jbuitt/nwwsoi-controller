@@ -23,6 +23,8 @@ test:
   - sed -i'' 's/WWWUSER=1000/WWWUSER=1001/' sail.env
   - sed -i'' 's/WWWGROUP=1000/WWWGROUP=1001/' sail.env
   - source sail.env
+  - npm i
+  - npm run build
   - ./vendor/bin/sail up -d
   - ./vendor/bin/sail artisan key:generate
   - ./vendor/bin/sail artisan migrate --seed
