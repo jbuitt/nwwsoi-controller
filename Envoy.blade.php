@@ -20,7 +20,7 @@
 @task('download_build', $on_servers)
     @for ($i=1; $i<=$num_controllers; $i++)
         echo 'NWWS-OI Controller - Creating release directory (if it does not already exist)..'
-        [ -d "/var/www/nwwsoi-controller{{ $i }}/releases" ] || mkdir -p /var/www/nwwsoi-controller{{ $i }}/releases/
+        [ -d "/var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}" ] || mkdir -p /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/
         echo 'NWWS-OI Controller - Changing directory to new release directory..'
         cd /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/
         echo 'NWWS-OI Controller - Downloading build artifacts..'
