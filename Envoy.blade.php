@@ -32,8 +32,8 @@
             exit 1
         fi
         rm -f /tmp/artifacts.zip
+        sleep 1
     @endfor
-    sleep 1
 @endtask
 
 @task('setup_new_env', $on_servers)
