@@ -1,0 +1,8 @@
+[
+    {
+        "nwwsoi-controller:pan-plugin:example-plugin": {
+            "sourceType": "git",
+            "sourceUrl": "https://github.com/jbuitt/controller-pan-plugins-example.git"
+        }
+    }
+]

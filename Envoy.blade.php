@@ -6,7 +6,11 @@
     $gitlab_url = 'https://git.sm-lan.net';
     $num_controllers = 1;
     $releases_to_keep = 5;
-    $release = date('YmdHis');
+    $releases = array();
+    for ($i=0; $i<$num_controllers; $i++) {
+        array_push($releases, date('YmdHis'));
+        sleep(1);
+    }
 @endsetup
 
 @story('deploy')
@@ -20,26 +24,25 @@
 @task('download_build', $on_servers)
     @for ($i=1; $i<=$num_controllers; $i++)
         echo 'NWWS-OI Controller - Creating release directory (if it does not already exist)..'
-        [ -d "/var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}" ] || mkdir -p /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/
+        [ -d "/var/www/nwwsoi-controller{{ $i }}/releases/{{ $releases[$i-1] }}" ] || mkdir -p /var/www/nwwsoi-controller{{ $i }}/releases/{{ $releases[$i-1] }}/
         echo 'NWWS-OI Controller - Changing directory to new release directory..'
-        cd /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/
+        cd /var/www/nwwsoi-controller{{ $i }}/releases/{{ $releases[$i-1] }}/
         echo 'NWWS-OI Controller - Downloading build artifacts..'
         curl --progress-bar --header 'PRIVATE-TOKEN: {{ $token }}' {{ $gitlab_url }}/api/v4/projects/{{ $project }}/jobs/{{ $job }}/artifacts --output /tmp/artifacts.zip
-        echo 'NWWS-OI Controller - Extracting build artifacts into /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/..'
+        echo 'NWWS-OI Controller - Extracting build artifacts into /var/www/nwwsoi-controller{{ $i }}/releases/{{ $releases[$i-1] }}/..'
         /usr/bin/unzip -qq /tmp/artifacts.zip
         if [[ $? != 0 ]]; then
             echo "Error: Artifacts file could not be unzipped."
             exit 1
         fi
         rm -f /tmp/artifacts.zip
-        sleep 1
     @endfor
 @endtask
 
 @task('setup_new_env', $on_servers)
     @for ($i=1; $i<=$num_controllers; $i++)
         echo 'NWWS-OI Controller - Changing directory to new release directory..'
-        cd /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release }}/
+        cd /var/www/nwwsoi-controller{{ $i }}/releases/{{ $releases[$i-1] }}/
 
         echo "NWWS-OI Controller - Creating .env file.."
         cp /var/www/nwwsoi-controller{{ $i }}/persistent/.env .env
@@ -49,6 +52,11 @@
 
         echo "NWWS-OI Controller - Creating docker-compose.yml file.."
         cp /var/www/nwwsoi-controller{{ $i }}/persistent/docker-compose.yml docker-compose.yml
+
+        if [[ -e "/var/www/nwwsoi-controller{{ $i }}/persistent/plugins.json" ]]; then
+           echo "NWWS-OI Controller - Creating plugins.json file.."
+           cp /var/www/nwwsoi-controller{{ $i }}/persistent/plugins.json plugins.json
+        fi
     @endfor
 @endtask
 
@@ -67,7 +75,7 @@
         cd /var/www/nwwsoi-controller{{ $i }}/
 
         echo 'NWWS-OI Controller - Replace current release symlink..'
-        ln -nfs /var/www/nwwsoi-controller{{ $i }}/releases/{{ $release}} /var/www/nwwsoi-controller{{ $i }}/current
+        ln -nfs /var/www/nwwsoi-controller{{ $i }}/releases/{{ $releases[$i-1] }} /var/www/nwwsoi-controller{{ $i }}/current
     @endfor
 @endtask
 
@@ -77,7 +85,7 @@
         cd /var/www/nwwsoi-controller{{ $i }}/current/
 
         echo 'NWWS-OI Controller - Exporting $COMPOSE_PROJECT_NAME..'
-        export COMPOSE_PROJECT_NAME={{ $release }}
+        export COMPOSE_PROJECT_NAME={{ $releases[$i-1] }}
 
         echo 'NWWS-OI Controller - Starting new Docker containers..'
         source sail.env
@@ -93,8 +101,11 @@
             sleep 1
         done
 
+        #echo 'NWWS-OI Controller - Installing plug-ins..'
+        #docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 ./artisan emwin-controller:install_plugins
+
         echo 'NWWS-OI Controller - Running database migrations..'
-        docker exec {{ $release }}-nwwsoi_controller-1 ./artisan migrate --seed --force --isolated
+        docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 ./artisan migrate --seed --force --isolated
     @endfor
 @endtask
 
@@ -104,13 +115,13 @@
         cd /var/www/nwwsoi-controller{{ $i }}/current/
 
         echo "NWWS-OI Controller - Clearing bootstrapped files.."
-        docker exec {{ $release }}-nwwsoi_controller-1 ./artisan optimize:clear
+        docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 ./artisan optimize:clear
 
         echo "NWWS-OI Controller - Restart Queue Worker.."
-        docker exec {{ $release }}-nwwsoi_controller-1 ./artisan queue:restart
+        docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 ./artisan queue:restart
 
         echo 'NWWS-OI Controller - Updating COMPOSE_PROJECT_NAME..'
-        echo {{ $release }} >/var/www/nwwsoi-controller{{ $i }}/COMPOSE_PROJECT_NAME
+        echo {{ $releases[$i-1] }} >/var/www/nwwsoi-controller{{ $i }}/COMPOSE_PROJECT_NAME
 
         echo 'NWWS-OI Controller - Removing old releases..'
         NUM_RELEASES=$(ls /var/www/nwwsoi-controller{{ $i }}/releases/ | wc -l)

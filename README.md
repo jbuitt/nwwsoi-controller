@@ -109,7 +109,14 @@ docker run --rm --interactive --tty \
 ./vendor/bin/sail artisan storage:link
 ```
 
-12. Finally, you can access the dashboard from a browser by going to [http://127.0.0.1:8080](http://127.0.0.1:8080).
+12. If you would like to use plug-ins, make a copy of the plugin config and run the command to install plugins:
+
+```
+cp plugins.json.example plugins.json
+./vendor/bin/sail artisan nwwsoi-controller:install_plugins
+```
+
+13. Finally, you can access the dashboard from a browser by going to [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
 You'll need an admin user to log into the dashboard, create one first by running:
 
