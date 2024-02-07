@@ -101,7 +101,7 @@
         done
 
         echo 'NWWS-OI Controller - Installing plug-ins..'
-        docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 ./artisan nwwsoi-controller:install_plugins
+        docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 su - sail -c "cd /var/www/html/ && ./artisan nwwsoi-controller:install_plugins"
 
         echo 'NWWS-OI Controller - Running database migrations..'
         docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 ./artisan migrate --seed --force --isolated
