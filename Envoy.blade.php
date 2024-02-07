@@ -106,6 +106,9 @@
 
         echo 'NWWS-OI Controller - Running database migrations..'
         docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 ./artisan migrate --seed --force --isolated
+
+        echo 'NWWS-OI Controller - Running npm run build (again)..'
+        docker exec {{ $releases[$i-1] }}-nwwsoi_controller-1 su - sail -c "cd /var/www/html/ && npm run build"
     @endfor
 @endtask
 
