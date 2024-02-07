@@ -26,7 +26,6 @@ class InstallPlugins extends Command
      */
     public function handle(): int
     {
-        print "Installing plugins..\n";
         $pluginList = config('nwwsoi-controller.enabled_pan_plugins');
         if (is_null($pluginList) || empty($pluginList)) {
             print "No plugins specified, exiting.\n";
@@ -36,7 +35,7 @@ class InstallPlugins extends Command
             print "No plugin config file found, exiting.\n";
             return 0;
         }
-        $pluginConfig = @json_decode(file_get_contents(base_path() . '/plugins.json'));
+        $pluginConfig = @json_decode(file_get_contents(base_path() . '/plugins.json'), TRUE);
         if (!$pluginConfig) {
             print "Error: Could not parse plugin config, exiting.\n";
             return 1;
@@ -60,7 +59,7 @@ class InstallPlugins extends Command
             $sourceUrl = $pluginConfig[$plugin]['sourceUrl'];
             // Create a temporary directory
             chdir('/tmp/');
-            $tempDir = shell_exec('/usr/bin/mktemp -d XXXXX');
+            $tempDir = rtrim(shell_exec('/usr/bin/mktemp -d XXXXX'));
             // Download file to temp dir
             $failedFlag = FALSE;
             switch ($sourceType) {
