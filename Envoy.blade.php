@@ -1,8 +1,7 @@
-@servers(['prod1' => 'www-data@192.168.36.220', 'prod2' => 'www-data@X.X.X.X'])
+@servers(['test' => 'www-data@192.168.36.220', 'prod' => 'www-data@X.X.X.X'])
 
 @setup
-    $on_servers = ['on' => 'prod1'];
-    // $on_servers = ['on' => ['prod1', 'prod2'], 'parallel' => true];
+    $on_servers = ['on' => $env];
     $gitlab_url = 'https://git.sm-lan.net';
     $num_controllers = 1;
     $releases_to_keep = 5;

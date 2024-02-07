@@ -8,7 +8,8 @@ stages:
 - sast
 - test
 - build
-- deploy
+- deployTest
+- deployProd
 sast:
   stage: sast
 include:
@@ -54,8 +55,8 @@ build:
     expire_in: 1 day
   tags:
   - wxnotify-docker
-deploy:
-  stage: deploy
+deployTest:
+  stage: deployTest
   script:
   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
   - eval $(ssh-agent -s)
@@ -64,12 +65,30 @@ deploy:
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   - composer install --prefer-dist --no-scripts -v -o
   - ./vendor/bin/envoy run deploy --commit="$CI_COMMIT_SHA" --token="$GITLAB_TOKEN"
-    --job="$BUILD_JOB_ID" --project="$CI_PROJECT_ID"
+    --job="$BUILD_JOB_ID" --project="$CI_PROJECT_ID" --env=test
   environment:
-    name: prod
-    url: https://nwwsoi-controller.wxnotify.com
+    name: test
+    url: https://nwwsoi-controller1.test.wxnotify.com
   only:
   - main
+  tags:
+  - wxnotify-docker
+deployProd:
+  stage: deployProd
+  script:
+  - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - composer install --prefer-dist --no-scripts -v -o
+  - ./vendor/bin/envoy run deploy --commit="$CI_COMMIT_SHA" --token="$GITLAB_TOKEN"
+    --job="$BUILD_JOB_ID" --project="$CI_PROJECT_ID" --env=prod
+  environment:
+    name: prod
+    url: https://nwwsoi-controller1.wxnotify.com
+  only:
+  - release
   tags:
   - wxnotify-docker
 variables:
