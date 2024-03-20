@@ -90,6 +90,7 @@
 
         # Check to make sure Laravel API is up and responding to requests
         while true; do
+            APP_PORT=$(grep '^APP_PORT' docker.env | awk -F= '{print \$2}')
             RESULTS=$(curl -sf http://127.0.0.1:${APP_PORT}/api/status || echo '{"statusCode":503,"message":"Service Unavailable","details":[]}')
             # echo "\$RESULTS = #$RESULTS#"
             if [[ $(echo $RESULTS | jq -r .statusCode 2>/dev/null) == "200" ]]; then
