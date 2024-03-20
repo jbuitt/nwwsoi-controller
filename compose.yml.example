@@ -1,7 +1,5 @@
 services:
     laravel.test:
-        env_file:
-            - docker.env
         build:
             context: ./docker/8.2
             dockerfile: Dockerfile
@@ -29,8 +27,6 @@ services:
             - soketi
 
     mysql:
-        env_file:
-            - docker.env
         image: 'mysql/mysql-server:8.0'
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
@@ -56,8 +52,6 @@ services:
             timeout: 5s
 
     adminer:
-        env_file:
-            - docker.env
         image: adminer
         ports:
             - '${DB_ADMIN_PORT:-18080}:8080'
@@ -65,8 +59,6 @@ services:
             - sail
 
     redis:
-        env_file:
-            - docker.env
         image: 'redis:alpine'
         ports:
             - '${FORWARD_REDIS_PORT:-6379}:6379'
@@ -83,8 +75,6 @@ services:
             timeout: 5s
 
     mailpit:
-        env_file:
-            - docker.env
         image: 'axllent/mailpit:latest'
         ports:
             - '${FORWARD_MAILPIT_PORT:-1025}:1025'
@@ -93,8 +83,6 @@ services:
             - sail
 
     soketi:
-        env_file:
-            - docker.env
         image: 'quay.io/soketi/soketi:latest-16-alpine'
         environment:
             SOKETI_DEBUG: '1'
@@ -109,8 +97,6 @@ services:
             - sail
 
     # soketi-proxy:
-    #    env_file:
-    #       - docker.env
     #     image: nginx
     #     ports:
     #         - '${SOKETI_PROXY_PORT:-6002}:6002'

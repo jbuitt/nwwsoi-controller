@@ -68,7 +68,7 @@
         export COMPOSE_PROJECT_NAME=$(cat /var/www/nwwsoi-controller{{ $i }}/COMPOSE_PROJECT_NAME)
 
         echo 'NWWS-OI Controller - Shutting down current Docker containers..'
-        docker compose down
+        docker compose --env-file docker.env down
 
         cd /var/www/nwwsoi-controller{{ $i }}/
 
@@ -86,13 +86,13 @@
         export COMPOSE_PROJECT_NAME={{ $releases[$i-1] }}
 
         echo 'NWWS-OI Controller - Starting new Docker containers..'
-        docker compose up -d
+        docker compose --env-file docker.env up -d
 
         # Check to make sure Laravel API is up and responding to requests
         while true; do
             RESULTS=$(curl -sf http://127.0.0.1:${APP_PORT}/api/status || echo '{"statusCode":503,"message":"Service Unavailable","details":[]}')
             # echo "\$RESULTS = #$RESULTS#"
-            if [[ $(echo $RESULTS | jq -r .statusCode) == "200" ]]; then
+            if [[ $(echo $RESULTS | jq -r .statusCode 2>/dev/null) == "200" ]]; then
                 break
             fi
             sleep 1
