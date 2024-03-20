@@ -46,11 +46,11 @@
         echo "NWWS-OI Controller - Creating .env file.."
         cp /var/www/nwwsoi-controller{{ $i }}/persistent/.env .env
 
-        echo "NWWS-OI Controller - Creating sail.env file.."
-        cp /var/www/nwwsoi-controller{{ $i }}/persistent/sail.env sail.env
+        echo "NWWS-OI Controller - Creating docker.env file.."
+        cp /var/www/nwwsoi-controller{{ $i }}/persistent/docker.env docker.env
 
-        echo "NWWS-OI Controller - Creating docker-compose.yml file.."
-        cp /var/www/nwwsoi-controller{{ $i }}/persistent/docker-compose.yml docker-compose.yml
+        echo "NWWS-OI Controller - Creating compose.yml file.."
+        cp /var/www/nwwsoi-controller{{ $i }}/persistent/compose.yml compose.yml
 
         if [[ -e "/var/www/nwwsoi-controller{{ $i }}/persistent/plugins.json" ]]; then
            echo "NWWS-OI Controller - Creating plugins.json file.."
@@ -68,7 +68,6 @@
         export COMPOSE_PROJECT_NAME=$(cat /var/www/nwwsoi-controller{{ $i }}/COMPOSE_PROJECT_NAME)
 
         echo 'NWWS-OI Controller - Shutting down current Docker containers..'
-        source sail.env
         docker compose down
 
         cd /var/www/nwwsoi-controller{{ $i }}/
@@ -87,7 +86,6 @@
         export COMPOSE_PROJECT_NAME={{ $releases[$i-1] }}
 
         echo 'NWWS-OI Controller - Starting new Docker containers..'
-        source sail.env
         docker compose up -d
 
         # Check to make sure Laravel API is up and responding to requests

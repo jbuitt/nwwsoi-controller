@@ -35,7 +35,7 @@ cd nwwsoi-controller/
 2. Copy the Docker Compose config file:
 
 ```
-cp docker-compose.yml.example docker-compose.yml
+cp compose.yml.example compose.yml
 ```
 
 3. Copy the example Docker env file to the file to source in the next step:
