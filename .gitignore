@@ -20,4 +20,4 @@ yarn-error.log
 /.vscode
 /app/public
 docker-compose.yml
-sail.env
+docker.env

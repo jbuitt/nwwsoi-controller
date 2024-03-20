@@ -38,16 +38,15 @@ cd nwwsoi-controller/
 cp docker-compose.yml.example docker-compose.yml
 ```
 
-3. Copy the example env file to the file to source in the next step:
+3. Copy the example Docker env file to the file to source in the next step:
 
 ```
-cp sail.env.example sail.env
+cp docker.env.example docker.env
 ```
 
-4. Next, source the env file and build all of the Docker images:
+4. Next, build all of the Docker images:
 
 ```
-source sail.env
 docker compose build
 ```
 
