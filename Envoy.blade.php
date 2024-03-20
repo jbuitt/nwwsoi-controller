@@ -2,7 +2,7 @@
 
 @setup
     $on_servers = ['on' => $env];
-    $gitlab_url = 'https://git.sm-lan.net';
+    $gitlab_url = 'https://gitlab.infra.wxnotify.com';
     $num_controllers = 1;
     $releases_to_keep = 5;
     $releases = array();
