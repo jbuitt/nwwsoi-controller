@@ -20,10 +20,9 @@ test:
   - composer install -ovn
   - cp .env.example .env
   - cp docker-compose.yml.example docker-compose.yml
-  - cp sail.env.example sail.env
-  - sed -i'' 's/WWWUSER=1000/WWWUSER=1001/' sail.env
-  - sed -i'' 's/WWWGROUP=1000/WWWGROUP=1001/' sail.env
-  - source sail.env
+  - cp docker.env.example docker.env
+  - sed -i'' 's/WWWUSER=1000/WWWUSER=1001/' docker.env
+  - sed -i'' 's/WWWGROUP=1000/WWWGROUP=1001/' docker.env
   - npm i
   - npm run build
   - ./vendor/bin/sail up -d
