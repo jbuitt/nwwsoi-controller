@@ -269,25 +269,23 @@ if __name__ == '__main__':
         xmpp.register_plugin('xep_0045') # Multi-User Chat
         xmpp.register_plugin('xep_0199') # XMPP Ping
 
-        # Connect to the XMPP server and start processing XMPP stanzas.
-        logging.info('Connecting to XMPP server..')
-        xmpp.connect()
+        # Connect to the XMPP server and start processing XMPP stanzas. If ConnectionResetError is encountered,
+        # catch the exception and reconnect to server
+        try:
+            logging.info('Connecting to XMPP server..')
+            xmpp.connect()
 
-        # If you do not have the dnspython library installed, you will need
-        # to manually specify the name of the server if it does not match
-        # the one in the JID. For example, to use Google Talk you would
-        # need to use:
-        #
-        # if xmpp.connect(('talk.google.com', 5222)):
-        #     ...
-        logging.info('Connected to XMPP server, starting to process incoming products.')
-        xmpp.process(forever=True)
+            logging.info('Connected to XMPP server, starting to process incoming products.')
+            xmpp.process(forever=True)
 
-        # Check for file that signifies that the process should exit
-        if os.path.isfile('/tmp/exit_nwws'):
-            os.remove('/tmp/exit_nwws')
-            logging.info('Exited.')
-            sys.exit(0)
+            # Check for file that signifies that the process should exit
+            if os.path.isfile('/tmp/exit_nwws'):
+                os.remove('/tmp/exit_nwws')
+                logging.info('Exited.')
+                sys.exit(0)
+
+        except ConnectionResetError:
+            logging.error('Caught ConnectionResetError exception, restarting..')
 
         logging.info('Sleeping for 5 seconds.')
         time.sleep(5)
