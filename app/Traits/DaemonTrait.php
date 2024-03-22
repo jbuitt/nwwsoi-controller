@@ -90,18 +90,16 @@ trait DaemonTrait
                             'pid' => $pid,
                         ),
                     );
-                } else {
-                    return array(
-                        'statusCode' => 200,
-                        'message' => 'OK',
-                        'details' => array(
-                            'status' => 'Stopped',
-                            'result' => "process not found or PID file does not exist",
-                            'pid' => -1,
-                        ),
-                    );
                 }
-                break;
+                return array(
+                    'statusCode' => 200,
+                    'message' => 'OK',
+                    'details' => array(
+                        'status' => 'Stopped',
+                        'result' => "process not found or PID file does not exist",
+                        'pid' => -1,
+                    ),
+                );
 
             case 'start':
                 // Check to see if process is already running
@@ -167,13 +165,12 @@ trait DaemonTrait
                         );
                     }
                 }
-                break;
 
             case 'stop':
                 // Before attempting to stop, make sure process is running
                 $running = TRUE;
-                exec('ps -ef | grep [n]wws.py', $output);
-                if (empty($output) || !file_exists($pidFile)) {
+                exec('ps -ef | grep [n]wws.py', $output1);
+                if (empty($output1) || !file_exists($pidFile)) {
                     return array(
                         'statusCode' => 409,
                         'message' => 'Conflict',
@@ -183,21 +180,21 @@ trait DaemonTrait
                             'pid' => -1,
                         ),
                     );
-                }
-                // Process is running and pid file exists, attempt to stop it
-                $pid = file_get_contents($pidFile);
-                exec('kill -INT ' . $pid);
-                // Wait until process stops and PID goes away
-                for ($i=0; $i<10; $i++) {
-                    // Sleep for 1 second
-                    sleep(1);
-                    // Check for running process
-                    exec('ps -ef | grep [n]wws.py', $output);
-                    if (empty($output) && !file_exists($pidFile)) {
-                        $running = FALSE;
-                        break;
+                } else {
+                    // Process is running and pid file exists, attempt to stop it
+                    $pid = file_get_contents($pidFile);
+                    exec('kill -INT ' . $pid);
+                    // Wait until process stops and PID goes away
+                    for ($i=0; $i<10; $i++) {
+                        // Sleep for 1 second
+                        sleep(1);
+                        // Check for running process
+                        exec('ps -ef | grep [n]wws.py', $output2);
+                        if (empty($output2)) {
+                            $running = FALSE;
+                            break;
+                        }
                     }
-                    unset($output);
                 }
                 // Return
                 if (!$running) {
@@ -210,18 +207,25 @@ trait DaemonTrait
                             'pid' => -1,
                         ),
                     );
-                } else {
-                    return array(
-                        'statusCode' => 500,
-                        'message' => 'Server Error',
-                        'details' => array(
-                            'status' => 'Error',
-                            'result' => "The process did not stop after 10 seconds",
-                            'pid' => -1,
-                        ),
-                    );
                 }
-                break;
+                return array(
+                    'statusCode' => 500,
+                    'message' => 'Server Error',
+                    'details' => array(
+                        'status' => 'Error',
+                        'result' => "The process did not stop after 10 seconds",
+                        'pid' => -1,
+                    ),
+                );
         }
+        return array(
+            'statusCode' => 400,
+            'message' => 'Bad Request',
+            'details' => array(
+                'status' => 'Bad Action',
+                'result' => '',
+                'pid' => -1,
+            ),
+        );
     }
 }

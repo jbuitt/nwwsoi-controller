@@ -28,7 +28,7 @@ class SettingsController extends Controller
         // If request to purge all products, do that noew
         if ($request->input('type') === 'purge_all_products') {
             Product::truncate();
-            if (!is_null(config('nwwsoi-controller.nwwsoi.archivedir')) && !is_null(config('nwwsoi-controller.nwwsoi.archivedir'))) {
+            if (!is_null(config('nwwsoi-controller.nwwsoi.archivedir'))) {
                 chdir(storage_path(config('nwwsoi-controller.nwwsoi.archivedir')));
                 exec('rm -rf *');
             }

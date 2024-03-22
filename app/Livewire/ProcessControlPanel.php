@@ -9,10 +9,29 @@ class ProcessControlPanel extends Component
 {
     use DaemonTrait;
 
+    /**
+     * @var string
+     */
     public $processStatus = 'Loading..';
-    // public $processResult = '';
+
+    /**
+     * @var bool
+     */
+    public $disabledFlag;
+
+    /**
+     * @var string
+     */
     public $buttonLabel = 'Start';
-    // public $buttonClasses = 'bg-green-500 hover:bg-green-700';
+
+    /**
+     * @var string
+     */
+    public $buttonClasses = '';
+
+    /**
+     * @var string
+     */
     public $buttonIconClass = '';
 
     protected $listeners = ['mrllUpdated'];

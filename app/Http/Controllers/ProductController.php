@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
@@ -12,9 +13,9 @@ class ProductController extends Controller
      * Purge old products from filesystem.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function purgeOldProds(Request $request, $days)
+    public function purgeOldProds(Request $request, $days): JsonResponse
     {
         // Check request input
         if (!is_numeric($days) && $days > 0) {

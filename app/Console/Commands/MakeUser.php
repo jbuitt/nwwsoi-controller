@@ -49,7 +49,7 @@ class MakeUser extends Command
                 'email' => $userEmail,
                 'password' => Hash::make($userPassword),
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             print "Error: User creation failed: " . $e->getMessage() . "\n";
             return 1;
         }
