@@ -162,9 +162,10 @@ class MUCBot(slixmpp.ClientXMPP):
         ttaaii = itemlist[0].attributes['ttaaii'].value.lower()
         cccc = itemlist[0].attributes['cccc'].value.lower()
         awipsid = itemlist[0].attributes['awipsid'].value.lower()
-        if len(awipsid) == 3:
-            awipsid = awipsid + cccc[1:4]
-        id = itemlist[0].attributes['id'].value.replace('nwws_processor', '0000')
+        # if len(awipsid) == 3:
+        #     awipsid = awipsid + cccc[1:4]
+        # id = itemlist[0].attributes['id'].value.replace('nwws_processor', '0000')
+        id = itemlist[0].attributes['id'].value
         content = itemlist[0].firstChild.nodeValue
         if awipsid:
             dayhourmin = datetime.utcnow().strftime("%d%H%M")
