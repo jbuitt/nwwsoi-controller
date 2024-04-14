@@ -1,4 +1,4 @@
-@servers(['test' => 'www-data@192.168.36.220', 'prod' => 'www-data@X.X.X.X'])
+@servers(['test' => 'www-data@192.168.36.220', 'prod' => 'www-data@100.96.228.111'])
 
 @setup
     $on_servers = ['on' => $env];
