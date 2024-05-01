@@ -289,6 +289,10 @@ if __name__ == '__main__':
 
         except ConnectionResetError:
             logging.error('Caught ConnectionResetError exception, restarting..')
+        except Exception as e:
+            logging.error('Caught ' + str(type(e)) + ' exception:')
+            logging.error(e)
+            logging.error('Restarting..')
 
         logging.info('Sleeping for 5 seconds.')
         time.sleep(5)
