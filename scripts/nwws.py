@@ -70,9 +70,78 @@ def sigusr1_handler(signal, frame):
     # set the log level to INFO as the default is ERROR
     log.setLevel(logging.INFO)
 
+def sigpipe_handler(signal, frame):
+    logging.info('Caught PIPE signal, restarting process..')
+    main()
+
+# Define signal handlers
 signal.signal(signal.SIGINT, sigint_handler)
 signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGUSR1, sigusr1_handler)
+signal.signal(signal.SIGPIPE, sigpipe_handler)
+
+def main():
+    # Check for environment variables
+    logging.info('Checking for environment variables..')
+    envVars = [
+        'NWWSOI_SERVER_HOST',
+        'NWWSOI_SERVER_PORT',
+        'NWWSOI_USERNAME',
+        'NWWSOI_PASSWORD',
+        'NWWSOI_RESOURCE',
+        'NWWSOI_ARCHIVE_DIR',
+        'NWWSOI_SERVER_CONNECT_RETRY',
+    ]
+    for envVar in envVars:
+        if os.environ.get(envVar) == None:
+            logging.error('The environment variable ' + envVar + ' does not exist, please set and try again.')
+            sys.exit(1)
+
+    # Create archive directory if it does not exist
+    if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR')):
+        os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR'))
+
+    # Start endless loop
+    logging.info('Starting execution loop..')
+    while True:
+
+        # Setup the MUCBot and register plugins. Note that while plugins may
+        # have interdependencies, the order in which you register them does
+        # not matter.
+        logging.info('Setting up MUCBot..')
+        xmpp = MUCBot(
+              os.environ.get('NWWSOI_USERNAME') + '@' + os.environ.get('NWWSOI_SERVER_HOST'), # JID
+              os.environ.get('NWWSOI_PASSWORD'),                                              # Password
+              'nwws@conference.' + os.environ.get('NWWSOI_SERVER_HOST'),                      # Room
+              os.environ.get('NWWSOI_RESOURCE'))                                              # Resource/Nickname
+        xmpp.register_plugin('xep_0030') # Service Discovery
+        xmpp.register_plugin('xep_0045') # Multi-User Chat
+        xmpp.register_plugin('xep_0199') # XMPP Ping
+
+        # Connect to the XMPP server and start processing XMPP stanzas. If ConnectionResetError is encountered,
+        # catch the exception and reconnect to server
+        try:
+            logging.info('Connecting to XMPP server..')
+            xmpp.connect()
+
+            logging.info('Connected to XMPP server, starting to process incoming products.')
+            xmpp.process(forever=True)
+
+            # Check for file that signifies that the process should exit
+            if os.path.isfile('/tmp/exit_nwws'):
+                os.remove('/tmp/exit_nwws')
+                logging.info('Exited.')
+                sys.exit(0)
+
+        except ConnectionResetError:
+            logging.error('Caught ConnectionResetError exception, restarting..')
+        except Exception as e:
+            logging.error('Caught ' + str(type(e)) + ' exception:')
+            logging.error(e)
+            logging.error('Restarting..')
+
+        logging.info('Sleeping for 5 seconds.')
+        time.sleep(5)
 
 class MUCBot(slixmpp.ClientXMPP):
 
@@ -96,7 +165,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_event_handler("session_start", self.start)
 
         # The groupchat_message event is triggered whenever a message
-        # stanza is received from any chat room. If you also also
+        # stanza is received from any chat room. If you also
         # register a handler for the 'message' event, MUC messages
         # will be processed by both handlers.
         self.add_event_handler("groupchat_message", self.muc_message)
@@ -234,65 +303,4 @@ class MUCBot(slixmpp.ClientXMPP):
 
 
 if __name__ == '__main__':
-
-    # Check for environment variables
-    logging.info('Checking for environment variables..')
-    envVars = [
-        'NWWSOI_SERVER_HOST',
-        'NWWSOI_SERVER_PORT',
-        'NWWSOI_USERNAME',
-        'NWWSOI_PASSWORD',
-        'NWWSOI_RESOURCE',
-        'NWWSOI_ARCHIVE_DIR',
-        'NWWSOI_SERVER_CONNECT_RETRY',
-    ]
-    for envVar in envVars:
-        if os.environ.get(envVar) == None:
-            logging.error('The environment variable ' + envVar + ' does not exist, please set and try again.')
-            sys.exit(1)
-
-    # Create archive directory if it does not exist
-    if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR')):
-        os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR'))
-
-    # Start endless loop
-    logging.info('Starting execution loop..')
-    while True:
-
-        # Setup the MUCBot and register plugins. Note that while plugins may
-        # have interdependencies, the order in which you register them does
-        # not matter.
-        logging.info('Setting up MUCBot..')
-        xmpp = MUCBot(
-              os.environ.get('NWWSOI_USERNAME') + '@' + os.environ.get('NWWSOI_SERVER_HOST'), # JID
-              os.environ.get('NWWSOI_PASSWORD'),                                              # Password
-              'nwws@conference.' + os.environ.get('NWWSOI_SERVER_HOST'),                      # Room
-              os.environ.get('NWWSOI_RESOURCE'))                                              # Resource/Nickname
-        xmpp.register_plugin('xep_0030') # Service Discovery
-        xmpp.register_plugin('xep_0045') # Multi-User Chat
-        xmpp.register_plugin('xep_0199') # XMPP Ping
-
-        # Connect to the XMPP server and start processing XMPP stanzas. If ConnectionResetError is encountered,
-        # catch the exception and reconnect to server
-        try:
-            logging.info('Connecting to XMPP server..')
-            xmpp.connect()
-
-            logging.info('Connected to XMPP server, starting to process incoming products.')
-            xmpp.process(forever=True)
-
-            # Check for file that signifies that the process should exit
-            if os.path.isfile('/tmp/exit_nwws'):
-                os.remove('/tmp/exit_nwws')
-                logging.info('Exited.')
-                sys.exit(0)
-
-        except ConnectionResetError:
-            logging.error('Caught ConnectionResetError exception, restarting..')
-        except Exception as e:
-            logging.error('Caught ' + str(type(e)) + ' exception:')
-            logging.error(e)
-            logging.error('Restarting..')
-
-        logging.info('Sleeping for 5 seconds.')
-        time.sleep(5)
+    main()
