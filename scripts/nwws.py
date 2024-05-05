@@ -125,7 +125,7 @@ def main():
             xmpp.connect()
 
             logging.info('Connected to XMPP server, starting to process incoming products.')
-            xmpp.process(forever=True)
+            xmpp.process(forever=False)
 
             # Check for file that signifies that the process should exit
             if os.path.isfile('/tmp/exit_nwws'):
