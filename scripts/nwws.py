@@ -16,6 +16,10 @@ import urllib3
 from datetime import datetime
 from xml.dom import minidom
 
+if 'APP_ENV' not in os.environ:
+    print("The environment variable 'APP_ENV' is not set. Please set it and try again.")
+    sys.exit(1)
+
 # Setup logging.
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] ' + os.environ.get('APP_ENV') + '.%(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', filename='storage/logs/nwws-' + datetime.utcnow().strftime("%Y-%m-%d") + '.log')
 
