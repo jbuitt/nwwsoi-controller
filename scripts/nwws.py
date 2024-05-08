@@ -71,7 +71,9 @@ def sigusr1_handler(signal, frame):
     log.setLevel(logging.INFO)
 
 def sigpipe_handler(signal, frame):
-    logging.info('Caught PIPE signal, restarting process..')
+    global xmpp
+    logging.info('Caught PIPE signal, disconnecting and restarting process..')
+    xmpp.disconnect()
     main()
 
 # Define signal handlers
@@ -80,7 +82,12 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGUSR1, sigusr1_handler)
 signal.signal(signal.SIGPIPE, sigpipe_handler)
 
+# define XMPP global
+xmpp = None
+
 def main():
+    global xmpp
+
     # Check for environment variables
     logging.info('Checking for environment variables..')
     envVars = [
@@ -125,7 +132,7 @@ def main():
             xmpp.connect()
 
             logging.info('Connected to XMPP server, starting to process incoming products.')
-            xmpp.process(forever=False)
+            xmpp.process()
 
             # Check for file that signifies that the process should exit
             if os.path.isfile('/tmp/exit_nwws'):
@@ -301,6 +308,11 @@ class MUCBot(slixmpp.ClientXMPP):
                                         presence['muc']['nick']),
                 mtype='groupchat')
 
+    def disconnect(self):
+        """
+        Disconnect from XMPP server
+        """
+        self.disconnect()
 
 if __name__ == '__main__':
     main()
