@@ -35,12 +35,16 @@ def sigint_handler(signal, frame):
     print('Caught INT signal, exiting.', file=sys.stderr)
     logging.info('Caught INT signal, exiting.')
     os.remove('storage/logs/nwws.pid')
+    file = open('/tmp/exit_nwws', 'w')
+    file.close()
     sys.exit(0)
 
 def sigterm_handler(signal, frame):
     print('Caught TERM signal, exiting.', file=sys.stderr)
     logging.info('Caught TERM signal, exiting.')
     os.remove('storage/logs/nwws.pid')
+    file = open('/tmp/exit_nwws', 'w')
+    file.close()
     sys.exit(0)
 
 def sigusr1_handler(signal, frame):
@@ -57,7 +61,6 @@ def sigusr1_handler(signal, frame):
     log.setLevel(logging.INFO)
 
 def sigpipe_handler(signal, frame):
-    # TODO: close socket port and restart process
     print('Caught PIPE signal, exiting.', file=sys.stderr)
     logging.info('Caught PIPE signal, exiting.')
     os.remove('storage/logs/nwws.pid')
@@ -265,7 +268,6 @@ class MUCBot(slixmpp.ClientXMPP):
         except Exception as e:
             logging.error('Caught ' + str(type(e)) + ' exception:')
             logging.error(e)
-            # TODO: close socket port and restart process
 
     def muc_online(self, presence):
         """
