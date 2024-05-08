@@ -26,16 +26,6 @@ pid = os.getpid()
 with open('./storage/logs/nwws.pid', 'w') as f:
     f.write(str(pid))
 
-# Python versions before 3.0 do not use UTF-8 encoding
-# by default. To ensure that Unicode is handled properly
-# throughout SliXMPP, we will set the default encoding
-# ourselves to UTF-8.
-if sys.version_info < (3, 0):
-    reload(sys)
-    sys.setdefaultencoding('utf8')
-else:
-    raw_input = input
-
 # Prevent multiple running instances by opening a port
 logging.info('Opening a local port to prevent duplicate executions..')
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,16 +35,12 @@ def sigint_handler(signal, frame):
     print('Caught INT signal, exiting.', file=sys.stderr)
     logging.info('Caught INT signal, exiting.')
     os.remove('storage/logs/nwws.pid')
-    file = open('/tmp/exit_nwws', 'w')
-    file.close()
     sys.exit(0)
 
 def sigterm_handler(signal, frame):
     print('Caught TERM signal, exiting.', file=sys.stderr)
     logging.info('Caught TERM signal, exiting.')
     os.remove('storage/logs/nwws.pid')
-    file = open('/tmp/exit_nwws', 'w')
-    file.close()
     sys.exit(0)
 
 def sigusr1_handler(signal, frame):
@@ -71,10 +57,11 @@ def sigusr1_handler(signal, frame):
     log.setLevel(logging.INFO)
 
 def sigpipe_handler(signal, frame):
-    global xmpp
-    logging.info('Caught PIPE signal, disconnecting and restarting process..')
-    xmpp.disconnect()
-    main()
+    # TODO: close socket port and restart process
+    print('Caught PIPE signal, exiting.', file=sys.stderr)
+    logging.info('Caught PIPE signal, exiting.')
+    os.remove('storage/logs/nwws.pid')
+    sys.exit(0)
 
 # Define signal handlers
 signal.signal(signal.SIGINT, sigint_handler)
@@ -82,12 +69,7 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGUSR1, sigusr1_handler)
 signal.signal(signal.SIGPIPE, sigpipe_handler)
 
-# define XMPP global
-xmpp = None
-
 def main():
-    global xmpp
-
     # Check for environment variables
     logging.info('Checking for environment variables..')
     envVars = [
@@ -133,12 +115,6 @@ def main():
 
             logging.info('Connected to XMPP server, starting to process incoming products.')
             xmpp.process()
-
-            # Check for file that signifies that the process should exit
-            if os.path.isfile('/tmp/exit_nwws'):
-                os.remove('/tmp/exit_nwws')
-                logging.info('Exited.')
-                sys.exit(0)
 
         except ConnectionResetError:
             logging.error('Caught ConnectionResetError exception, restarting..')
@@ -228,67 +204,68 @@ class MUCBot(slixmpp.ClientXMPP):
                    for stanza objects and the Message stanza to see
                    how it may be used.
         """
-        #if msg['mucnick'] != self.nick and self.nick in msg['body']:
-        #    self.send_message(mto=msg['from'].bare,
-        #                      mbody="I heard that, %s." % msg['mucnick'],
-        #                      mtype='groupchat')
-        logging.info('Message stanza rcvd from nwws-oi saying... ' + msg['body'])
-        xmldoc = minidom.parseString(str(msg))
-        itemlist = xmldoc.getElementsByTagName('x')
-        ttaaii = itemlist[0].attributes['ttaaii'].value.lower()
-        cccc = itemlist[0].attributes['cccc'].value.lower()
-        awipsid = itemlist[0].attributes['awipsid'].value.lower()
-        if len(awipsid) == 3:
-            awipsid = awipsid + cccc[1:4]
-        id = itemlist[0].attributes['id'].value.replace('nwws_processor', '0000')
-        # id = itemlist[0].attributes['id'].value
-        content = itemlist[0].firstChild.nodeValue
-        if awipsid:
-            dayhourmin = datetime.utcnow().strftime("%d%H%M")
-            filename = cccc + '_' + ttaaii + '-' + awipsid + '.' + dayhourmin + '_' + id + '.txt'
-            # Write out product to a temporary file
-            logging.info("Writing " + filename)
-            if not os.path.exists('/tmp/nwws/'):
-                os.makedirs('/tmp/nwws/')
-            # Remove every other line
-            lines = content.splitlines()
-            pathtofile = '/tmp/nwws/' + filename
-            f = open(pathtofile, 'w')
-            count = 0
-            for line in lines:
-                if count == 0 and line == '':
-                    continue
-                if count % 2 == 0:
-                    f.write(line + "\n")
-                count += 1
-            f.close()
-            # Run a product arrival notification command using the product file as the parameter (if pan_run is defined as an environment variable)
-            if not os.environ.get('NWWSOI_PAN_RUN') == None and not os.environ.get('NWWSOI_PAN_RUN') == "":
-                try:
-                    result = subprocess.run(os.environ.get('NWWSOI_PAN_RUN') + ' ' + pathtofile, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True)
-                    logging.info('Successfully executed PAN_RUN command. Output:')
-                    logging.info(' ' + result.stdout.decode('utf-8').replace('\n', ' '))
-                except subprocess.CalledProcessError as e:
-                    logging.error('Failed to execute PAN_RUN command:')
-                    logging.error(' {}'.format(e.output).encode())
-            # If user specified NWWSOI_FILE_SAVE_REGEX, check to see if filename matches supplied regex
-            if not os.environ.get('NWWSOI_FILE_SAVE_REGEX') == None:
-                if not re.fullmatch(os.environ.get('NWWSOI_FILE_SAVE_REGEX'), filename) == None:
+        try:
+            logging.info('Message stanza rcvd from nwws-oi saying... ' + msg['body'])
+            xmldoc = minidom.parseString(str(msg))
+            itemlist = xmldoc.getElementsByTagName('x')
+            ttaaii = itemlist[0].attributes['ttaaii'].value.lower()
+            cccc = itemlist[0].attributes['cccc'].value.lower()
+            awipsid = itemlist[0].attributes['awipsid'].value.lower()
+            if len(awipsid) == 3:
+                awipsid = awipsid + cccc[1:4]
+            id = itemlist[0].attributes['id'].value.replace('nwws_processor', '0000')
+            # id = itemlist[0].attributes['id'].value
+            content = itemlist[0].firstChild.nodeValue
+            if awipsid:
+                dayhourmin = datetime.utcnow().strftime("%d%H%M")
+                filename = cccc + '_' + ttaaii + '-' + awipsid + '.' + dayhourmin + '_' + id + '.txt'
+                # Write out product to a temporary file
+                logging.info("Writing " + filename)
+                if not os.path.exists('/tmp/nwws/'):
+                    os.makedirs('/tmp/nwws/')
+                # Remove every other line
+                lines = content.splitlines()
+                pathtofile = '/tmp/nwws/' + filename
+                f = open(pathtofile, 'w')
+                count = 0
+                for line in lines:
+                    if count == 0 and line == '':
+                        continue
+                    if count % 2 == 0:
+                        f.write(line + "\n")
+                    count += 1
+                f.close()
+                # Run a product arrival notification command using the product file as the parameter (if pan_run is defined as an environment variable)
+                if not os.environ.get('NWWSOI_PAN_RUN') == None and not os.environ.get('NWWSOI_PAN_RUN') == "":
+                    try:
+                        result = subprocess.run(os.environ.get('NWWSOI_PAN_RUN') + ' ' + pathtofile, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True)
+                        logging.info('Successfully executed PAN_RUN command. Output:')
+                        logging.info(' ' + result.stdout.decode('utf-8').replace('\n', ' '))
+                    except subprocess.CalledProcessError as e:
+                        logging.error('Failed to execute PAN_RUN command:')
+                        logging.error(' {}'.format(e.output).encode())
+                # If user specified NWWSOI_FILE_SAVE_REGEX, check to see if filename matches supplied regex
+                if not os.environ.get('NWWSOI_FILE_SAVE_REGEX') == None:
+                    if not re.fullmatch(os.environ.get('NWWSOI_FILE_SAVE_REGEX'), filename) == None:
+                        # Make sure destination directory exists
+                        if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
+                            os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
+                        # Move product to destination directory
+                        shutil.move('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
+                    else:
+                        # logging.info("Not saving " + filename + ", since it did not match NWWSOI_FILE_SAVE_REGEX.")
+                        os.remove('/tmp/nwws/' + filename)
+                else:
+                    # No file save regex supplied, default to writing out product
                     # Make sure destination directory exists
                     if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
                         os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
                     # Move product to destination directory
                     shutil.move('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
-                else:
-                    # logging.info("Not saving " + filename + ", since it did not match NWWSOI_FILE_SAVE_REGEX.")
-                    os.remove('/tmp/nwws/' + filename)
-            else:
-                # No file save regex supplied, default to writing out product
-                # Make sure destination directory exists
-                if not os.path.exists(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc):
-                    os.makedirs(os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc)
-                # Move product to destination directory
-                shutil.move('/tmp/nwws/' + filename, os.environ.get('NWWSOI_ARCHIVE_DIR') + '/' + cccc + '/' + filename)
+        except Exception as e:
+            logging.error('Caught ' + str(type(e)) + ' exception:')
+            logging.error(e)
+            # TODO: close socket port and restart process
 
     def muc_online(self, presence):
         """
@@ -307,12 +284,6 @@ class MUCBot(slixmpp.ClientXMPP):
                 mbody="Hello, %s %s" % (presence['muc']['role'],
                                         presence['muc']['nick']),
                 mtype='groupchat')
-
-    def disconnect(self):
-        """
-        Disconnect from XMPP server
-        """
-        self.disconnect()
 
 if __name__ == '__main__':
     main()
