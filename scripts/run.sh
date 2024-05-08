@@ -1,6 +1,6 @@
 #!/bin/bash
-while 1; do
-    /usr/bin/python -u scripts/nwws.py
+while true; do
+    /usr/bin/python3 -u scripts/nwws.py
     if [[ -e "/tmp/exit_nwws" ]]; then
         echo "Process terminated normally, exiting."
         exit 0
