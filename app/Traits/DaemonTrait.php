@@ -72,151 +72,18 @@ trait DaemonTrait
     */
     public function performDeamonCommand($command): array
     {
-        $pidFile = storage_path() . '/logs/nwws.pid';
-        $logFile = storage_path() . '/logs/nwws-' . Carbon::now()->format('Y-m-d') . '.log';
-        $running = FALSE;
-        $pid = -1;
         switch($command) {
             case 'status':
-                exec('ps -ef | grep [n]wws.py', $output);
-                if (!empty($output) && file_exists($pidFile)) {
-                    $pid = intval(file_get_contents($pidFile));
-                    return array(
-                        'statusCode' => 200,
-                        'message' => 'OK',
-                        'details' => array(
-                            'status' => 'Running',
-                            'result' => "PID = $pid",
-                            'pid' => $pid,
-                        ),
-                    );
-                }
-                return array(
-                    'statusCode' => 200,
-                    'message' => 'OK',
-                    'details' => array(
-                        'status' => 'Stopped',
-                        'result' => "process not found or PID file does not exist",
-                        'pid' => -1,
-                    ),
-                );
+                return $this->deamonStatus();
 
             case 'start':
-                // Check to see if process is already running
-                exec('ps -ef | grep [n]wws.py', $output);
-                if (!empty($output) && file_exists($pidFile)) {
-                    $pid = intval(file_get_contents($pidFile));
-                    return array(
-                        'statusCode' => 409,
-                        'message' => 'Conflict',
-                        'details' => array(
-                            'status' => 'Error',
-                            'result' => "The process is already running",
-                            'pid' => $pid,
-                        ),
-                    );
-                } else {
-                    // Change directory to base_path
-                    chdir(base_path());
-                    // Start NWWS-OI ingester
-                    exec('./artisan nwwsoi-controller:daemon:run-ingester >storage/logs/nwws-output.log 2>&1 &', $output, $retval);
-                    // Check return value
-                    if ($retval !== 0) {
-                        return array(
-                            'statusCode' => 500,
-                            'message' => 'Server Error',
-                            'details' => array(
-                                'status' => 'Error',
-                                'result' => "The process failed to start: " . implode(', ', $output),
-                                'pid' => -1,
-                            ),
-                        );
-                    }
-                    // Loop for 10 seconds or until process starts
-                    for ($i=0; $i<10; $i++) {
-                        exec('ps -ef | grep [n]wws.py', $output);
-                        if (!empty($output) && file_exists($pidFile)) {
-                            $pid = intval(file_get_contents($pidFile));
-                            $running = TRUE;
-                            break;
-                        }
-                        sleep(1);
-                    }
-                    // Return result
-                    if ($running) {
-                        return array(
-                            'statusCode' => 200,
-                            'message' => 'OK',
-                            'details' => array(
-                                'status' => 'Running',
-                                'result' => "PID = $pid",
-                                'pid' => $pid,
-                            ),
-                        );
-                    } else {
-                        return array(
-                            'statusCode' => 500,
-                            'message' => 'Server Error',
-                            'details' => array(
-                                'status' => 'Error',
-                                'result' => "The process did not start after 10 seconds",
-                                'pid' => -1,
-                            ),
-                        );
-                    }
-                }
+                return $this->deamonStart();
 
             case 'stop':
-                // Before attempting to stop, make sure process is running
-                $running = TRUE;
-                exec('ps -ef | grep [n]wws.py', $output1);
-                if (empty($output1) || !file_exists($pidFile)) {
-                    return array(
-                        'statusCode' => 409,
-                        'message' => 'Conflict',
-                        'details' => array(
-                            'status' => 'Error',
-                            'result' => "Process is not running or PID file does not exist",
-                            'pid' => -1,
-                        ),
-                    );
-                } else {
-                    // Process is running and pid file exists, attempt to stop it
-                    $pid = file_get_contents($pidFile);
-                    exec('kill -INT ' . $pid);
-                    // Wait until process stops and PID goes away
-                    for ($i=0; $i<10; $i++) {
-                        // Sleep for 1 second
-                        sleep(1);
-                        // Check for running process
-                        exec('ps -ef | grep [n]wws.py', $output2);
-                        if (empty($output2)) {
-                            $running = FALSE;
-                            break;
-                        }
-                    }
-                }
-                // Return
-                if (!$running) {
-                    return array(
-                        'statusCode' => 200,
-                        'message' => 'OK',
-                        'details' => array(
-                            'status' => 'Stopped',
-                            'result' => "",
-                            'pid' => -1,
-                        ),
-                    );
-                }
-                return array(
-                    'statusCode' => 500,
-                    'message' => 'Server Error',
-                    'details' => array(
-                        'status' => 'Error',
-                        'result' => "The process did not stop after 10 seconds",
-                        'pid' => -1,
-                    ),
-                );
+                return $this->deamonStop();
+
+            case 'restart':
+                return $this->deamonRestart();
         }
         return array(
             'statusCode' => 400,
@@ -227,5 +94,185 @@ trait DaemonTrait
                 'pid' => -1,
             ),
         );
+    }
+
+   /**
+    * Get the daemon status
+    *
+    * @return array The return data
+    */
+    private function deamonStatus(): array
+    {
+        $pidFile = storage_path() . '/logs/nwws.pid';
+        $pid = -1;
+        exec('ps -ef | grep [n]wws.py', $output);
+        if (!empty($output) && file_exists($pidFile)) {
+            $pid = intval(file_get_contents($pidFile));
+            return array(
+                'statusCode' => 200,
+                'message' => 'OK',
+                'details' => array(
+                    'status' => 'Running',
+                    'result' => "PID = $pid",
+                    'pid' => $pid,
+                ),
+            );
+        }
+        return array(
+            'statusCode' => 200,
+            'message' => 'OK',
+            'details' => array(
+                'status' => 'Stopped',
+                'result' => "process not found or PID file does not exist",
+                'pid' => -1,
+            ),
+        );
+    }
+
+   /**
+    * Start the daemon
+    *
+    * @return array The return data
+    */
+    private function deamonStart(): array
+    {
+        $pidFile = storage_path() . '/logs/nwws.pid';
+        $running = FALSE;
+        $pid = -1;
+        // Check to see if process is already running
+        exec('ps -ef | grep [n]wws.py', $output);
+        if (!empty($output) && file_exists($pidFile)) {
+            $pid = intval(file_get_contents($pidFile));
+            return array(
+                'statusCode' => 409,
+                'message' => 'Conflict',
+                'details' => array(
+                    'status' => 'Error',
+                    'result' => "The process is already running",
+                    'pid' => $pid,
+                ),
+            );
+        } else {
+            // Change directory to base_path
+            chdir(base_path());
+            // Start NWWS-OI ingester
+            exec('./artisan nwwsoi-controller:daemon:run-ingester >storage/logs/nwws-output.log 2>&1 &', $output, $retval);
+            // Check return value
+            if ($retval !== 0) {
+                return array(
+                    'statusCode' => 500,
+                    'message' => 'Server Error',
+                    'details' => array(
+                        'status' => 'Error',
+                        'result' => "The process failed to start: " . implode(', ', $output),
+                        'pid' => -1,
+                    ),
+                );
+            }
+            // Loop for 10 seconds or until process starts
+            for ($i=0; $i<10; $i++) {
+                exec('ps -ef | grep [n]wws.py', $output);
+                if (!empty($output) && file_exists($pidFile)) {
+                    $pid = intval(file_get_contents($pidFile));
+                    $running = TRUE;
+                    break;
+                }
+                sleep(1);
+            }
+            // Return result
+            if ($running) {
+                return array(
+                    'statusCode' => 200,
+                    'message' => 'OK',
+                    'details' => array(
+                        'status' => 'Running',
+                        'result' => "PID = $pid",
+                        'pid' => $pid,
+                    ),
+                );
+            } else {
+                return array(
+                    'statusCode' => 500,
+                    'message' => 'Server Error',
+                    'details' => array(
+                        'status' => 'Error',
+                        'result' => "The process did not start after 10 seconds",
+                        'pid' => -1,
+                    ),
+                );
+            }
+        }
+    }
+
+   /**
+    * Stop the daemon
+    *
+    * @return array The return data
+    */
+    private function deamonStop(): array
+    {
+        $pidFile = storage_path() . '/logs/nwws.pid';
+        // Before attempting to stop, make sure process is running
+        $running = TRUE;
+        exec('ps -ef | grep [n]wws.py', $output1);
+        if (empty($output1) || !file_exists($pidFile)) {
+            return array(
+                'statusCode' => 409,
+                'message' => 'Conflict',
+                'details' => array(
+                    'status' => 'Error',
+                    'result' => "Process is not running or PID file does not exist",
+                    'pid' => -1,
+                ),
+            );
+        } else {
+            // Process is running and pid file exists, attempt to stop it
+            $pid = file_get_contents($pidFile);
+            exec('kill -INT ' . $pid);
+            // Wait until process stops and PID goes away
+            for ($i=0; $i<10; $i++) {
+                // Sleep for 1 second
+                sleep(1);
+                // Check for running process
+                exec('ps -ef | grep [n]wws.py', $output2);
+                if (empty($output2)) {
+                    $running = FALSE;
+                    break;
+                }
+            }
+        }
+        // Return
+        if (!$running) {
+            return array(
+                'statusCode' => 200,
+                'message' => 'OK',
+                'details' => array(
+                    'status' => 'Stopped',
+                    'result' => "",
+                    'pid' => -1,
+                ),
+            );
+        }
+        return array(
+            'statusCode' => 500,
+            'message' => 'Server Error',
+            'details' => array(
+                'status' => 'Error',
+                'result' => "The process did not stop after 10 seconds",
+                'pid' => -1,
+            ),
+        );
+    }
+
+   /**
+    * Restart the daemon
+    *
+    * @return array The return data
+    */
+    private function deamonRestart(): array
+    {
+        $this->deamonStop();
+        sleep(1);
+        return $this->deamonStart();
     }
 }
