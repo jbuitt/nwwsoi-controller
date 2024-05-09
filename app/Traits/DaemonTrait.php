@@ -74,16 +74,16 @@ trait DaemonTrait
     {
         switch($command) {
             case 'status':
-                return $this->deamonStatus();
+                return $this->daemonStatus();
 
             case 'start':
-                return $this->deamonStart();
+                return $this->daemonStart();
 
             case 'stop':
-                return $this->deamonStop();
+                return $this->daemonStop();
 
             case 'restart':
-                return $this->deamonRestart();
+                return $this->daemonRestart();
         }
         return array(
             'statusCode' => 400,
@@ -101,11 +101,11 @@ trait DaemonTrait
     *
     * @return array The return data
     */
-    private function deamonStatus(): array
+    private function daemonStatus(): array
     {
-        $pidFile = storage_path() . '/logs/nwws.pid';
+        $pidFile = storage_path('logs') . '/nwws.pid';
         $pid = -1;
-        exec('ps -ef | grep [n]wws.py', $output);
+        exec('ps -ef | grep "\/bin\/bash [s]cripts/run.sh"', $output);
         if (!empty($output) && file_exists($pidFile)) {
             $pid = intval(file_get_contents($pidFile));
             return array(
@@ -134,7 +134,7 @@ trait DaemonTrait
     *
     * @return array The return data
     */
-    private function deamonStart(): array
+    private function daemonStart(): array
     {
         $pidFile = storage_path() . '/logs/nwws.pid';
         $running = FALSE;
@@ -169,11 +169,11 @@ trait DaemonTrait
                     ),
                 );
             }
-            // Loop for 30 seconds or until process starts
-            for ($i=0; $i<30; $i++) {
-                exec('ps -ef | grep [n]wws.py', $output);
-                if (!empty($output) && file_exists($pidFile)) {
-                    $pid = intval(file_get_contents($pidFile));
+            // Loop for 10 seconds or until process starts
+            for ($i=0; $i<10; $i++) {
+                $results = $this->daemonStatus();
+                if ($results['details']['status'] === 'Running') {
+                    $pid = $results['details']['pid'];
                     $running = TRUE;
                     break;
                 }
@@ -196,7 +196,7 @@ trait DaemonTrait
                     'message' => 'Server Error',
                     'details' => array(
                         'status' => 'Error',
-                        'result' => "The process did not start after 30 seconds",
+                        'result' => "The process did not start after 10 seconds",
                         'pid' => -1,
                     ),
                 );
@@ -209,7 +209,7 @@ trait DaemonTrait
     *
     * @return array The return data
     */
-    private function deamonStop(): array
+    private function daemonStop(): array
     {
         $pidFile = storage_path() . '/logs/nwws.pid';
         // Before attempting to stop, make sure process is running
@@ -230,12 +230,12 @@ trait DaemonTrait
             $pid = file_get_contents($pidFile);
             exec('kill -INT ' . $pid);
             // Wait until process stops and PID goes away
-            for ($i=0; $i<30; $i++) {
+            for ($i=0; $i<10; $i++) {
                 // Sleep for 1 second
                 sleep(1);
                 // Check for running process
-                exec('ps -ef | grep [n]wws.py', $output2);
-                if (empty($output2)) {
+                $results = $this->daemonStatus();
+                if ($results['details']['status'] === 'Stopped') {
                     $running = FALSE;
                     break;
                 }
@@ -258,7 +258,7 @@ trait DaemonTrait
             'message' => 'Server Error',
             'details' => array(
                 'status' => 'Error',
-                'result' => "The process did not stop after 30 seconds",
+                'result' => "The process did not stop after 10 seconds",
                 'pid' => -1,
             ),
         );
@@ -269,7 +269,7 @@ trait DaemonTrait
     *
     * @return array The return data
     */
-    private function deamonRestart(): array
+    private function daemonRestart(): array
     {
         $this->deamonStop();
         sleep(1);
