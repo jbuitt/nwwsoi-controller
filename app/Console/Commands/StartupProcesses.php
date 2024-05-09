@@ -56,7 +56,7 @@ class StartupProcesses extends Command
             print "There is a config present, but autostart is set to false.\n";
         }
         // Sleep for 60 seconds so supervisord doesn't think the process stopped too quickly
-        print "Sleeping for 60 seconds..\n";
+        print "Sleeping for 60 seconds to avoid supervisord thinking it died..\n";
         sleep(60);
         // Done
         return 0;
