@@ -103,7 +103,7 @@ trait DaemonTrait
     */
     private function daemonStatus(): array
     {
-        $pidFile = storage_path('logs') . '/run.pid';
+        $pidFile = storage_path('logs') . '/nwws.pid';
         $pid = -1;
         exec('ps -ef | grep scripts\/run\.sh | grep bash | grep -v grep', $output);
         if (!empty($output) && file_exists($pidFile)) {
@@ -136,7 +136,7 @@ trait DaemonTrait
     */
     private function daemonStart(): array
     {
-        $pidFile = storage_path() . '/logs/run.pid';
+        $pidFile = storage_path() . '/logs/nwws.pid';
         $running = FALSE;
         $pid = -1;
         // Check to see if process is already running
@@ -211,7 +211,7 @@ trait DaemonTrait
     */
     private function daemonStop(): array
     {
-        $pidFile = storage_path() . '/logs/run.pid';
+        $pidFile = storage_path() . '/logs/nwws.pid';
         // Before attempting to stop, make sure process is running
         $running = TRUE;
         exec('ps -ef | grep scripts\/run\.sh | grep bash | grep -v grep', $output1);
