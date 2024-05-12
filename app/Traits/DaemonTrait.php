@@ -103,9 +103,9 @@ trait DaemonTrait
     */
     private function daemonStatus(): array
     {
-        $pidFile = storage_path('logs') . '/nwws.pid';
+        $pidFile = storage_path('logs') . '/run.pid';
         $pid = -1;
-        exec('ps -ef | grep "\/bin\/bash [s]cripts/run.sh"', $output);
+        exec('ps -ef | grep scripts\/run\.sh | grep bash | grep -v grep', $output);
         if (!empty($output) && file_exists($pidFile)) {
             $pid = intval(file_get_contents($pidFile));
             return array(
@@ -136,11 +136,11 @@ trait DaemonTrait
     */
     private function daemonStart(): array
     {
-        $pidFile = storage_path() . '/logs/nwws.pid';
+        $pidFile = storage_path() . '/logs/run.pid';
         $running = FALSE;
         $pid = -1;
         // Check to see if process is already running
-        exec('ps -ef | grep [n]wws.py', $output);
+        exec('ps -ef | grep scripts\/run\.sh | grep bash | grep -v grep', $output);
         if (!empty($output) && file_exists($pidFile)) {
             $pid = intval(file_get_contents($pidFile));
             return array(
@@ -211,10 +211,10 @@ trait DaemonTrait
     */
     private function daemonStop(): array
     {
-        $pidFile = storage_path() . '/logs/nwws.pid';
+        $pidFile = storage_path() . '/logs/run.pid';
         // Before attempting to stop, make sure process is running
         $running = TRUE;
-        exec('ps -ef | grep [n]wws.py', $output1);
+        exec('ps -ef | grep scripts\/run\.sh | grep bash | grep -v grep', $output1);
         if (empty($output1) || !file_exists($pidFile)) {
             return array(
                 'statusCode' => 409,
