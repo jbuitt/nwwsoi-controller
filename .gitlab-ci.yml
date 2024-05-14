@@ -4,18 +4,25 @@
 # Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+#
+# Deployment behavior:
+#
+# * Push to dev branch -> run 'sast' and 'runTests' stages
+# * Create MR for dev into main -> run no stages
+# * Merge MR into main branch -> run 'build' and 'deployToTest' stages
+# * Create MR for main into release -> run no stages
+# * Merge MR into release branch -> run 'build' and 'deployToProd' stages
+#
 stages:
-- sast
 - test
+- runTests
 - build
-- deployTest
-- deployProd
-sast:
-  stage: sast
-include:
-- template: Security/SAST.gitlab-ci.yml
-test:
-  stage: test
+- deployToTest
+- deployToProd
+runTests:
+  stage: runTests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"'
   script:
   - composer install -ovn
   - cp .env.example .env
@@ -31,12 +38,12 @@ test:
   - ./vendor/bin/sail artisan test
   - ./vendor/bin/sail down
   - sudo /usr/bin/chown -R deployment:deployment *
-  only:
-  - dev
   tags:
   - wxnotify-docker
 build:
   stage: build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME =~ /(main|release)/'
   script:
   - composer install --prefer-dist --no-scripts -v -o
   - npm i
@@ -54,8 +61,10 @@ build:
     expire_in: 1 day
   tags:
   - wxnotify-docker
-deployTest:
-  stage: deployTest
+deployToTest:
+  stage: deployToTest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == "main"'
   script:
   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
   - eval $(ssh-agent -s)
@@ -68,12 +77,12 @@ deployTest:
   environment:
     name: test
     url: https://nwwsoi-controller1.test.wxnotify.com
-  only:
-  - main
   tags:
   - wxnotify-docker
-deployProd:
-  stage: deployProd
+deployToProd:
+  stage: deployToProd
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == "release"'
   script:
   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
   - eval $(ssh-agent -s)
@@ -86,9 +95,12 @@ deployProd:
   environment:
     name: prod
     url: https://nwwsoi-controller1.wxnotify.com
-  only:
-  - release
   tags:
   - wxnotify-docker
+include:
+- template: Jobs/SAST.gitlab-ci.yml
+- template: Jobs/Secret-Detection.gitlab-ci.yml
+#- template: Security/SAST-IaC.gitlab-ci.yml
+#- template: Security/Dependency-Scanning.gitlab-ci.yml
 variables:
   SAST_EXCLUDED_ANALYZERS: "nodejs-scan,semgrep,eslint"
