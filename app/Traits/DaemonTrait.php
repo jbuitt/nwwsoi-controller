@@ -242,7 +242,7 @@ trait DaemonTrait
             }
         }
         // If there are processes still running, force them to quit
-        exec('killall nwws.py');
+        exec('killall nwws.py >/dev/null 2>&1');
         if (file_exists(storage_path() . '/logs/nwws.pid')) {
             unlink(storage_path() . '/logs/nwws.pid');
         }
