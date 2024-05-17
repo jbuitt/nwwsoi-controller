@@ -241,6 +241,10 @@ trait DaemonTrait
                 }
             }
         }
+        // If there are processes still running, force them to quit
+        exec('killall nwws.py');
+        unlink(storage_path() . '/logs/nwws.pid');
+        $running = FALSE;
         // Return
         if (!$running) {
             return array(
