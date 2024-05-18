@@ -49,7 +49,7 @@ trait DaemonTrait
     {
         //print "**DEBUG** \$command = $command\n";
         // Check to make sure that valid command was passed
-        if (!in_array($command, ['status', 'start', 'stop'])) {
+        if (!in_array($command, ['status', 'start', 'stop', 'restart'])) {
             return array(
                 'statusCode' => 400,
                 'message' => 'Bad Request',
@@ -277,8 +277,8 @@ trait DaemonTrait
     */
     private function daemonRestart(): array
     {
-        $this->deamonStop();
+        $this->daemonStop();
         sleep(1);
-        return $this->deamonStart();
+        return $this->daemonStart();
     }
 }
