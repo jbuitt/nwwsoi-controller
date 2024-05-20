@@ -41,17 +41,14 @@ class NwwsProcessWatchdog extends Command
     {
         // Get the last line of the current nwws.py log file
         $logFile = storage_path('logs') . '/nwws-' . date('Y-m-d') . '.log';
-
         // Get last line of log file
         $lastLogLine = rtrim(shell_exec('tail -n 1 ' . $logFile));
-
         // Check last line for connection lost message
-        if (preg_match('/connection_lost: \(None,\)/', $lastLogLine)) {
+        if (preg_match('/connection_lost:/', $lastLogLine)) {
             // Line found, restart NWWS-OI process
             Log::info('Connection lost found, restarting NWWS-OI process..');
             Artisan::call('nwwsoi-controller:daemon:control restart');
         }
-
         // Done!
         return 0;
    }
