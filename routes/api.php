@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\FailedJob;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +19,8 @@ Route::get('/status', function() {
     return response()->json([
         'statusCode' => 200,
         'message' => 'OK',
-        'details' => [],
+        'details' => [
+            'queue_failures' => FailedJob::count(),
+        ],
     ], 200);
 });
