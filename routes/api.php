@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\FailedJob;
+use App\Models\NwwsProcessRestart;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,7 @@ Route::get('/status', function() {
         'message' => 'OK',
         'details' => [
             'queue_failures' => FailedJob::count(),
+            'nwws_proc_restarts' => NwwsProcessRestart::whereDate('created_at', '=', now()->yesterday())->count(),
         ],
     ], 200);
 });

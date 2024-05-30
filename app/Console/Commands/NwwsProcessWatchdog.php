@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
+use App\Models\NwwsProcessRestart;
 
 class NwwsProcessWatchdog extends Command
 {
@@ -48,6 +49,8 @@ class NwwsProcessWatchdog extends Command
             // Line found, restart NWWS-OI process
             Log::info('Connection lost found, restarting NWWS-OI process..');
             Artisan::call('nwwsoi-controller:daemon:control restart');
+            // Add an entry to the nwws_process_restarts table
+            NwwsProcessRestart::create();
         }
         // Done!
         return 0;
