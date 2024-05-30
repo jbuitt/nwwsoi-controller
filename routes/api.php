@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use App\Models\FailedJob;
 use App\Models\NwwsProcessRestart;
 
@@ -17,12 +18,16 @@ use App\Models\NwwsProcessRestart;
 
 // Status endpoint
 Route::get('/status', function() {
+    $nwwsProcRestarts = -1;
+    if (Schema::hasTable('nwws_process_restarts')) {
+        $nwwsProcRestarts = NwwsProcessRestart::whereDate('created_at', '=', now()->yesterday())->count();
+    }
     return response()->json([
         'statusCode' => 200,
         'message' => 'OK',
         'details' => [
             'queue_failures' => FailedJob::count(),
-            'nwws_proc_restarts' => NwwsProcessRestart::whereDate('created_at', '=', now()->yesterday())->count(),
+            'nwws_proc_restarts' => $nwwsProcRestarts,
         ],
     ], 200);
 });
