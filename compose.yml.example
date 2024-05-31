@@ -20,6 +20,12 @@ services:
             - '.:/var/www/html'
         networks:
             - sail
+        healthcheck:
+            test:
+               - CMD
+               - curl
+               - '-sf'
+               - 'http://localhost/api/status'
         depends_on:
             - mysql
             - redis
