@@ -87,6 +87,9 @@
         echo 'NWWS-OI Controller - Exporting $COMPOSE_PROJECT_NAME..'
         export COMPOSE_PROJECT_NAME={{ $releases[$i-1] }}
 
+        echo 'NWWS-OI Controller - (Re)building Docker images..'
+        docker compose -p {{ $release }} --env-file docker.env build
+
         echo 'NWWS-OI Controller - Starting new Docker containers..'
         docker compose --env-file docker.env up -d
 
