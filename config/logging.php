@@ -127,6 +127,12 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'applog' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/app.log'),
+            'days' => 7,
+        ],
+
         'gelf' => [
             'driver' => 'custom',
 
@@ -140,7 +146,6 @@ return [
             // Default is an empty array.
             'processors' => [
                 \Hedii\LaravelGelfLogger\Processors\NullStringProcessor::class,
-                \Hedii\LaravelGelfLogger\Processors\AddControllerFieldProcessor::class,
                 // another processor...
             ],
 
@@ -157,10 +162,6 @@ return [
             // message in the 'source' field. When forgotten or set to null,
             // the current hostname is used.
             'system_name' => env('LOGGING_SYSTEM_NAME'),
-
-            // This optional option adds a 'controller' field. This is custom
-            // to NWWS-OI Controller.
-            'controller_name' => env('LOGGING_CONTROLLER_NAME'),
 
             // This optional option determines if you want the UDP, TCP or HTTP
             // transport for the gelf log messages. Default is UDP

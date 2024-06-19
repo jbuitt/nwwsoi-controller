@@ -2,9 +2,6 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
-
 trait DaemonTrait
 {
     /**

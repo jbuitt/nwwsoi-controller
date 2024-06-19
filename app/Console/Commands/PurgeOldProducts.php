@@ -52,10 +52,14 @@ class PurgeOldProducts extends Command
             return 1;
         }
         // Delete old products from database
-        Log::info('Purging products older than ' . $days . ' days from database..');
+        Log::info('Purging products older than ' . $days . ' days from database..', [
+            'app_name' => config('app.name')
+        ]);
         Product::whereDate('created_at', '<=', Carbon::now()->subDays(intval($days)))->delete();
         // Delete old products from filesystem
-        Log::info('Purging NWWS-OI products older than ' . $days . ' days from filesystem..');
+        Log::info('Purging NWWS-OI products older than ' . $days . ' days from filesystem..', [
+            'app_name' => config('app.name')
+        ]);
         exec('/usr/bin/find ' . storage_path(config('nwwsoi-controller.nwwsoi.archivedir')) . ' -mtime +' . $days . ' -delete', $output, $exitCode);
         // Done!
         print("Done.\n");

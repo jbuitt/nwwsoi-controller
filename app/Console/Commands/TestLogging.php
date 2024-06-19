@@ -59,7 +59,9 @@ class TestLogging extends Command
         print "  Port: " . config('nwwsoi-controller.logging.port') . "\n";
         print "\n";
         print "Triggering new log message with level '$level'..  ";
-        Log::$level('Test log message.', ['foo' => json_encode(['bar' => 'baz'])]);
+        Log::$level('Test log message.', [
+            'app_name' => config('app.name')
+        ]);
         print "Done.\n";
         return 0;
     }

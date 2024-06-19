@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class UpdateNwwsLogFile extends Command
 {
@@ -41,6 +42,9 @@ class UpdateNwwsLogFile extends Command
             return 0;
         }
         // Send USR1 signal to process to update log file
+        Log::info('Updating nwws.py log name..', [
+            'app_name' => config('app.name')
+        ]);
         exec('/usr/bin/kill -USR1 ' . $pid . ' 2>&1', $output, $retval);
         // Done!
         return $retval;

@@ -47,7 +47,9 @@ class NwwsProcessWatchdog extends Command
         // Check last line for connection lost message
         if (preg_match('/connection_lost:/', $lastLogLine)) {
             // Line found, restart NWWS-OI process
-            Log::info('Connection lost found, restarting NWWS-OI process..');
+            Log::info('Connection lost found, restarting NWWS-OI process..', [
+                'app_name' => config('app.name')
+            ]);
             Artisan::call('nwwsoi-controller:daemon:control restart');
             // Add an entry to the nwws_process_restarts table
             NwwsProcessRestart::create();

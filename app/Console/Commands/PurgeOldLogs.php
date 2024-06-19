@@ -36,7 +36,9 @@ class PurgeOldLogs extends Command
             return 1;
         }
         // Delete old files
-        Log::info('Purging old log files older than ' . $days . ' days..');
+        Log::info('Purging old log files older than ' . $days . ' days..', [
+            'app_name' => config('app.name')
+        ]);
         exec('/usr/bin/find ' . storage_path('logs/') . ' -type f -mtime +' . $days . ' -delete 2>&1', $output, $exitCode);
         if ($exitCode !== 0) {
             print "Error: " . implode("\n", $output) . "\n";

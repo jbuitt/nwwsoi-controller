@@ -62,7 +62,9 @@ class RunIngester extends Command
         //Log::debug(json_encode($procEnvVars));
         // Process is not already running, attempt to start it and append output to log
         if (config('nwwsoi-controller.python_client_path') !== '') {
-            Log::info("Running command '" . config('nwwsoi-controller.python_client_path') . "'..");
+            Log::info("Running command '" . config('nwwsoi-controller.python_client_path') . "'..", [
+                'app_name' => config('app.name')
+            ]);
             $process = Process::forever()
                 ->env($procEnvVars)
                 ->start(config('nwwsoi-controller.python_client_path'));
@@ -74,9 +76,13 @@ class RunIngester extends Command
             }
             // Wait for process to end (crash or receive TERM/KILL signal)
             $result = $process->wait();
-            Log::info('NWWS-OI Ingester process stopped.');
+            Log::info('NWWS-OI Ingester process stopped.', [
+                'app_name' => config('app.name')
+            ]);
         } else {
-            Log::error('Python client path is not defined, exiting.');
+            Log::error('Python client path is not defined, exiting.', [
+                'app_name' => config('app.name')
+            ]);
         }
         // Done!
         return 0;

@@ -43,6 +43,9 @@ class InstallPlugins extends Command
         // Loop through each plugin and install it
         foreach (explode(',', $pluginList) as $plugin) {
             print "Installing plugin $plugin..\n";
+            Log::info('Installing plugin ' . $plugin . '..', [
+                'app_name' => config('app.name')
+            ]);
             if (!isset($pluginConfig[$plugin])) {
                 print "Warning: No config found for $plugin, skipping.\n";
                 continue;

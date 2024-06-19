@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use App\Traits\DaemonTrait;
 
 class StartupProcesses extends Command
@@ -57,6 +57,9 @@ class StartupProcesses extends Command
         }
         // Sleep for 60 seconds so supervisord doesn't think the process stopped too quickly
         print "Sleeping for 60 seconds to avoid supervisord thinking it died prematurely..\n";
+        Log::info('Sleeping for 60 seconds to avoid supervisord thinking it died prematurely..', [
+            'app_name' => config('app.name')
+        ]);
         sleep(60);
         // Done
         return 0;

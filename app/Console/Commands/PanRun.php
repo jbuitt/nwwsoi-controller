@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 use App\Events\NewProductArrived;
 use App\Models\Product;
 
