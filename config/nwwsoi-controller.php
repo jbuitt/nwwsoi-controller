@@ -72,4 +72,15 @@ return [
     |
     */
     'python_client_path' => env('NWWSOI_PYTHON_CLIENT_PATH', '/usr/bin/python3 -u scripts/nwws.py'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logging configuration
+    |--------------------------------------------------------------------------
+    */
+    'logging' => [
+        'host' => env('LOGGING_HOST', '127.0.0.1'),
+        'transport' => env('LOGGING_TRANSPORT', 'UDP'),
+        'port' => env('LOGGING_PORT', 12201),
+    ],
 ];

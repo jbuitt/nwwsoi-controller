@@ -54,9 +54,9 @@ class TestLogging extends Command
             return 1;
         }
         print "Logging config:\n\n";
-        print "  Host: " . config('wxingest.logging.host') . "\n";
-        print "  Transport: " . config('wxingest.logging.transport') . "\n";
-        print "  Port: " . config('wxingest.logging.port') . "\n";
+        print "  Host: " . config('nwwsoi-controller.logging.host') . "\n";
+        print "  Transport: " . config('nwwsoi-controller.logging.transport') . "\n";
+        print "  Port: " . config('nwwsoi-controller.logging.port') . "\n";
         print "\n";
         print "Triggering new log message with level '$level'..  ";
         Log::$level('Test log message.', ['foo' => json_encode(['bar' => 'baz'])]);
