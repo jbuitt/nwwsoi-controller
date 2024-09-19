@@ -25,9 +25,9 @@ class Kernel extends ConsoleKernel
         }
 
         // Run the NWWS-OI process watchdog every minute
-        $schedule
-            ->command('nwwsoi-controller:nwws-process-watchdog')
-            ->everyMinute();
+        // $schedule
+        //     ->command('nwwsoi-controller:nwws-process-watchdog')
+        //     ->everyMinute();
 
         // Create new date-based log file that nwws.py uses to write logs
         $schedule
