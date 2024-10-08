@@ -168,6 +168,26 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_event_handler("muc::%s::got_online" % self.room,
                                self.muc_online)
 
+        # The disconnected event is triggered whenever the
+        # connection disconnects for some reason
+        self.add_event_handler("disconnected", self.disconnected)
+
+        # The socket_error event is triggered whenever the
+        # connection fails for some reason
+        self.add_event_handler("connection_failed", self.connection_failed)
+
+        # The killed event is triggered whenever the
+        # connection is killed for some reason
+        self.add_event_handler("killed", self.killed)
+
+        # The socket_error event is triggered whenever the
+        # connection socket disconnects for some reason
+        self.add_event_handler("socket_error", self.socket_error)
+
+        # The failed_auth event is triggered whenever the
+        # supplied invalid credentials to the XMPP server
+        self.add_event_handler("failed_auth", self.auth_failed)
+
     async def start(self, event):
         """
         Process the session_start event.
@@ -288,6 +308,26 @@ class MUCBot(slixmpp.ClientXMPP):
                 mbody="Hello, %s %s" % (presence['muc']['role'],
                                         presence['muc']['nick']),
                 mtype='groupchat')
+
+    def auth_failed(self, event):
+        logging.error('Authentication failed, exiting.')
+        sys.exit(1)
+
+    def connection_failed(self, event):
+        logging.error('Connection failed, exiting.')
+        sys.exit(1)
+
+    def killed(self, event):
+        logging.error('Connection killed, exiting.')
+        sys.exit(1)
+
+    def disconnected(self, event):
+        logging.error('Disconnected from server, exiting.')
+        sys.exit(1)
+
+    def socket_error(self, event):
+        logging.error('Socket error encountered, exiting.')
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
